@@ -20,8 +20,16 @@ private class Tuple<T1, T2>
 enum TBlock 
 { 
 	literal(s : String); 
-	openBlock(s : String); 
+	
+	// Keyword blocks
+	ifBlock(s : String);
+	elseifBlock(s : String);
+	elseBlock;
+	forBlock(s : String);
+	
+	// And the closing block for the keywords
 	closeBlock;
+	
 	codeBlock(s : String);
 	printBlock(s : String);
 	// TODO: Comment block {* *}
@@ -29,7 +37,7 @@ enum TBlock
 
 class HTemplateParser 
 {
-	static var openBlockKeywords = ['if', 'for'];
+	static var openBlockKeywords = ['if', 'else', 'elseif', 'for'];
 	
 	public function new() 
 	{
@@ -159,13 +167,21 @@ class HTemplateParser
 			// Test whether the block is an open block {#if, {#for ... {#} or a codeblock.
 			for(keyword in openBlockKeywords)
 			{
-				var test = new EReg('/^{#\\s*' + keyword + '\\b', 'i');
+				var test = new EReg('^{#\\s*' + keyword + '\\b', 'i');
 				if(test.match(template))
 				{
-					var script = parseScript(template.substr(2 + test.matched(0).length));
-					return { block: TBlock.openBlock(StringTools.trim(script)), length: 2 + test.matched(0).length + script.length + 1 };
+					var script = parseScript(template.substr(test.matched(0).length));
+					var blockType = Type.resolveEnum('TBlock.' + keyword + 'Block');
+					
+					var block = Type.createEnum(TBlock, keyword + 'Block', keyword == 'else' ? [] : [StringTools.trim(script)]);
+					
+					return { block: block, length: test.matched(0).length + script.length + 1 };
 				}
 			}
+			
+			// No keyword, so it's a codeBlock.
+			var script = parseScript(template.substr(2));
+			return { block: TBlock.codeBlock(StringTools.trim(script)), length: 2 + script.length + 1 };
 		}
 		
 		throw 'No valid block type found.';

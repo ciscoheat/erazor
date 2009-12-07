@@ -37,15 +37,28 @@ class ScriptBuilder
 		switch(block)
 		{
 			case literal(s):
-				output += "'" + StringTools.replace(s, "'", "\\'") + "'";
+				return context + '.' + concatMethod + "('" + StringTools.replace(s, "'", "\\'") + "');\n";
 			
-			case openBlock(s):
+			case ifBlock(s):
+				return "if(" + s + ") {\n";
+
+			case elseifBlock(s):
+				return "} elseif(" + s + ") {\n";
+
+			case elseBlock:
+				return "} else {\n";
+
 			case closeBlock:
+				return "}\n";
+				
+			case forBlock(s):
+				return "for(" + s + ") {\n";
+				
 			case codeBlock(s):
+				throw 'Not implemented.';
+			
 			case printBlock(s):
-				output += s;
-		}
-		
-		return output + ");\n";
+				return context + '.' + concatMethod + "(" + s + ");\n";
+		}		
 	}
 }
