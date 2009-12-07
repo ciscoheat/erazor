@@ -21,11 +21,9 @@ class TestHTemplate
 		
 	}
 	
-	/*
 	public function test_If_basic_vars_are_parsed_correctly()
 	{
 		htemplate = new HTemplate('Hello {$name}');
 		Assert.equals('Hello Boris', htemplate.execute( { name: 'Boris' } ));
 	}
-	*/
 }

@@ -12,7 +12,7 @@ class ScriptBuilder
 	private var context : String;
 	private var concatMethod : String;
 
-	public function new(context : String, ?concatMethod = 'add')
+	public function new(context : String, concatMethod : String)
 	{
 		this.context = context;
 		this.concatMethod = concatMethod;
