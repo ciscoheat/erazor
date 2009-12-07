@@ -43,7 +43,7 @@ class ScriptBuilder
 				return "if(" + s + ") {\n";
 
 			case elseifBlock(s):
-				return "} elseif(" + s + ") {\n";
+				return "} else if(" + s + ") {\n";
 
 			case elseBlock:
 				return "} else {\n";
@@ -55,7 +55,7 @@ class ScriptBuilder
 				return "for(" + s + ") {\n";
 				
 			case codeBlock(s):
-				throw 'Not implemented.';
+				return s + "\n";
 			
 			case printBlock(s):
 				return context + '.' + concatMethod + "(" + s + ");\n";
