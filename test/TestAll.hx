@@ -9,6 +9,7 @@ class TestAll
 	static function main() 
 	{
 		var runner = new utest.Runner();
+		
 		runner.addCase(new TestHTemplate());
 		runner.addCase(new TestHTemplateParser());
 		runner.addCase(new TestScriptBuilder());

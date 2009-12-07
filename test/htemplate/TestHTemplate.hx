@@ -30,4 +30,10 @@ class TestHTemplate
 		htemplate = new HTemplate('Hello {$name}');
 		Assert.equals('Hello Boris', htemplate.execute(vars));
 	}
+	
+	public function test_If_basic_vars_are_parsed_correctly_with_whitespace()
+	{
+		htemplate = new HTemplate("  Hello {$name}  \n ");
+		Assert.equals("  Hello Boris  \n ", htemplate.execute( { name: 'Boris' } ));
+	}
 }
