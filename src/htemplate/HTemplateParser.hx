@@ -30,23 +30,29 @@ class HTemplateParser
 		
 		while(blockTest.match(template))
 		{
-			output.push(TBlock.literal(blockTest.matchedLeft()));
+			var leftContent = blockTest.matchedLeft();			
+			if(leftContent.length > 0)
+				output.push(TBlock.literal(leftContent));
+				
+			template = blockTest.matchedRight();
 			
-			if(blockTest.matched(2).length != 0)
-			{			
-				switch(blockTest.matched(1))
-				{
-					case '$':
-						output.push(TBlock.printBlock(blockTest.matched(2)));
-					case '#':
-						output.push(TBlock.openBlock(blockTest.matched(2)));
-				}
-			}
-			else
+			if(blockTest.matched(2).length == 0)
 			{
 				output.push(TBlock.closeBlock);
+				continue;
 			}
+				
+			switch(blockTest.matched(1))
+			{
+				case '$':
+					output.push(TBlock.printBlock(blockTest.matched(2)));
+				case '#':
+					output.push(TBlock.openBlock(blockTest.matched(2)));
+			}			
 		}
+		
+		if(template.length > 0)
+			output.push(TBlock.literal(template));
 		
 		return output;
 	}
