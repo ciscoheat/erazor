@@ -5,18 +5,6 @@
 
 package htemplate;
 
-private class Tuple<T1, T2>
-{
-	public var first(default, null) : T1;
-	public var second(default, null) : T2;
-	
-	public function new(first : T1, second : T2)
-	{
-		this.first = first;
-		this.second = second;
-	}
-}
-
 enum TBlock 
 { 
 	literal(s : String); 
