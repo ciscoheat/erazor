@@ -53,6 +53,16 @@ class TestHTemplateParser
 		// String substitution
 		output = parser.parse('Hello {$"Boris"}');
 		Assert.same([TBlock.literal("Hello "), TBlock.printBlock('"Boris"')], output);
+
+		// String substitution with escaped quotation marks
+		output = parser.parse('Hello {$a + "A \\" string."}');
+		Assert.same([TBlock.literal("Hello "), TBlock.printBlock('a + "A \\" string."')], output);
+
+		output = parser.parse("Hello {$a + 'A \\' string.'}");
+		Assert.same([TBlock.literal("Hello "), TBlock.printBlock("a + 'A \\' string.'")], output);
+
+		output = parser.parse('{$"\'Mixing\'"}');
+		Assert.same([TBlock.printBlock("\"'Mixing'\"")], output);
 		
 		// Braces around var
 		output = parser.parse('Hello {{$name}}');		
@@ -114,12 +124,23 @@ class TestHTemplateParser
 	public function test_If_parsing_exceptions_are_thrown()
 	{
 		var self = this;
+		
+		// Unclosed tags
 		Assert.raises(function() {
 			self.parser.parse('{#if incompleted == true');
 		});
 		
 		Assert.raises(function() {
 			self.parser.parse('{$echo{{');
+		});
+		
+		// Unclosed strings
+		Assert.raises(function() {
+			self.parser.parse('{$a + "unclosed string}');
+		});
+		
+		Assert.raises(function() {
+			self.parser.parse("{#if a == 'Oops}");
 		});
 	}
 }
