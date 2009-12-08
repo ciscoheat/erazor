@@ -5,9 +5,9 @@
 
 package htemplate;
 
-import htemplate.HTemplateParser;
+//import htemplate.Parser;
 
-class ScriptBuilder 
+class ScriptBuilder
 {
 	private var context : String;
 	private var concatMethod : String;
@@ -69,6 +69,6 @@ class ScriptBuilder
 				
 			case restoreCapture(v):
 				return v + " = " + context + ".toString();\n" + context + " = __restore_buf__();\n";
-		}		
+		}
 	}
 }
