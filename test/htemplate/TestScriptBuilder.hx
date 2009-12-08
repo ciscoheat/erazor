@@ -5,7 +5,7 @@
 
 package htemplate;
 
-import htemplate.HTemplateParser;
+import htemplate.Parser;
 import htemplate.ScriptBuilder;
 
 import utest.Assert;
@@ -14,7 +14,7 @@ class TestScriptBuilder
 {
 	var builder : ScriptBuilder;
 
-	public function new() 
+	public function new()
 	{
 		
 	}
@@ -38,11 +38,11 @@ class TestScriptBuilder
 	{
 		var input = [
 			TBlock.ifBlock("(a == 0)"),
-			TBlock.literal('Zero'), 
-			TBlock.elseifBlock("(a == 1 && b == 2)"), 
-			TBlock.literal('One'), 
+			TBlock.literal('Zero'),
+			TBlock.elseifBlock("(a == 1 && b == 2)"),
+			TBlock.literal('One'),
 			TBlock.elseBlock,
-			TBlock.literal('Above'), 
+			TBlock.literal('Above'),
 			TBlock.closeBlock,
 		];
 		
@@ -60,9 +60,9 @@ class TestScriptBuilder
 	public function test_If_for_TBlocks_are_assembled_correctly()
 	{
 		var input = [
-			TBlock.forBlock("(u in users)"), 
+			TBlock.forBlock("(u in users)"),
 			TBlock.printBlock('u.name'),
-			TBlock.literal('<br>'), 
+			TBlock.literal('<br>'),
 			TBlock.closeBlock
 		];
 		
@@ -77,7 +77,7 @@ class TestScriptBuilder
 	public function test_If_codeBlocks_are_assembled_correctly()
 	{
 		var input = [
-			TBlock.codeBlock("a = 0; if(b == 2) {"), 
+			TBlock.codeBlock("a = 0; if(b == 2) {"),
 			TBlock.literal('TEST'),
 			TBlock.closeBlock
 		];
@@ -93,8 +93,8 @@ class TestScriptBuilder
 	{
 		var input = [
 			TBlock.captureBlock,
-			TBlock.literal('haxe'), 
-			TBlock.restoreCapture('v'), 
+			TBlock.literal('haxe'),
+			TBlock.restoreCapture('v'),
 			TBlock.literal(' '),
 			TBlock.printBlock('uc(v)')
 		];
@@ -110,10 +110,10 @@ class TestScriptBuilder
 		
 		input = [
 			TBlock.captureBlock,
-			TBlock.literal('ha'), 
+			TBlock.literal('ha'),
 			TBlock.captureBlock,
-			TBlock.literal('x'), 
-			TBlock.restoreCapture('v2'), 
+			TBlock.literal('x'),
+			TBlock.restoreCapture('v2'),
 			TBlock.literal('e'),
 			TBlock.restoreCapture('v1')
 		];
@@ -132,12 +132,12 @@ class TestScriptBuilder
 			"v2 = __b__.toString();",
 			// restore popping the stack
 			// we are now in the scope of the first capture
-			"__b__ = __restore_buf__();", 
+			"__b__ = __restore_buf__();",
 			"__b__.add('e');",
 			"v1 = __b__.toString();",
 			// restore the global scop
 			// we don't even need to check if the stack is empty beucase it can't be
-			"__b__ = __restore_buf__();", 
+			"__b__ = __restore_buf__();",
 		], builder.build(input));
 	}
 
