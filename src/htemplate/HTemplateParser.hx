@@ -14,6 +14,7 @@ enum TBlock
 	elseifBlock(s : String);
 	elseBlock;
 	forBlock(s : String);
+	whileBlock(s : String);
 	
 	// And the closing block for the keywords
 	closeBlock;
@@ -27,7 +28,14 @@ enum TBlock
 
 class HTemplateParser 
 {
-	static var openBlockKeywords = ['if', 'else', 'elseif', 'for'];
+	static var openBlocks = [
+		{ keyword : 'ifBlock', pattern : ~/^{#\s*if\b/},
+		{ keyword : 'elseifBlock', pattern : ~/^{#\s*else\s+if\b/},
+		{ keyword : 'elseBlock', pattern : ~/^{#\s*else\b/},
+		{ keyword : 'forBlock', pattern : ~/^{#\s*for\b/},
+		{ keyword : 'whileBlock', pattern : ~/^{#\s*while\b/},
+	];
+
 	
 	public function new() 
 	{
@@ -48,7 +56,7 @@ class HTemplateParser
 		{
 			var peek = template.charAt(next + 1);
 			
-			if(peek == '#' || peek == '$')
+			if(peek == '#' || peek == '$' || peek == '?')
 			{
 				return next;
 			}
@@ -151,29 +159,31 @@ class HTemplateParser
 			return { block: TBlock.printBlock(StringTools.trim(script)), length: 2 + script.length + 1 };
 		}
 
-		// openBlock or codeBlock
+		// openBlock
 		if(template.charAt(1) == '#')
 		{
 			// Test whether the block is an open block {#if, {#for ... {#} or a codeblock.
-			for(keyword in openBlockKeywords)
+			for(item in openBlocks)
 			{
-				var test = new EReg('^{#\\s*' + keyword + '\\b', 'i');
-				if(test.match(template))
+				if(item.pattern.match(template))
 				{
-					var script = parseScript(template.substr(test.matched(0).length));
-					var block = Type.createEnum(TBlock, keyword + 'Block', keyword == 'else' ? [] : [StringTools.trim(script)]);
+					var script = parseScript(template.substr(item.pattern.matched(0).length));
+					var block = Type.createEnum(TBlock, item.keyword, item.keyword == 'elseBlock' ? [] : [StringTools.trim(script)]);
 					
-					return { block: block, length: test.matched(0).length + script.length + 1 };
+					return { block: block, length: item.pattern.matched(0).length + script.length + 1 };
 				}
-			}
-			
-			// No keyword, so it's a codeBlock.
+			}			
+		}
+		
+		// codeBlock
+		if(template.charAt(1) == '?')
+		{
 			var script = parseScript(template.substr(2));
-			return { block: TBlock.codeBlock(StringTools.trim(script)), length: 2 + script.length + 1 };
+			return { block: TBlock.codeBlock(StringTools.trim(script)), length: 2 + script.length + 1 };			
 		}
 		
 		// nextBlockPos() prevents from coming here, but just in case.
-		throw 'No valid block type found.';
+		throw 'No valid block type found: ' + template.substr(0, 100) + " ...";
 	}
 	
 	public function parse(template : String) : Array<TBlock> 

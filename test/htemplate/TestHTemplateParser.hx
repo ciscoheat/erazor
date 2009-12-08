@@ -76,14 +76,14 @@ class TestHTemplateParser
 	public function test_If_codeblocks_are_parsed_correctly()
 	{
 		// Single codeblock
-		var output = parser.parse('Test: {#a = 0; Lib.print("Evil Bracke}"); }');
+		var output = parser.parse('Test: {?a = 0; Lib.print("Evil Bracke}"); }');
 		Assert.same([
 			TBlock.literal("Test: "),
 			TBlock.codeBlock('a = 0; Lib.print("Evil Bracke}");')
 		], output);
 		
 		// Nested codeblock
-		var output = parser.parse('{# a = 0; if(b == 2) { Lib.print("Ok"); }}');
+		var output = parser.parse('{? a = 0; if(b == 2) { Lib.print("Ok"); }}');
 		Assert.same([
 			TBlock.codeBlock('a = 0; if(b == 2) { Lib.print("Ok"); }')
 		], output);		
@@ -91,34 +91,38 @@ class TestHTemplateParser
 
 	public function test_If_keyword_blocks_are_parsed_correctly()
 	{
-		var output = parser.parse('Test: {#if a = 0}Zero{#}');
-		Assert.same([TBlock.literal("Test: "), TBlock.ifBlock("a = 0"), TBlock.literal('Zero'), TBlock.closeBlock], output);
+		// if
+		var output = parser.parse('Test: {#if(a == 0)}Zero{#}');
+		Assert.same([TBlock.literal("Test: "), TBlock.ifBlock("(a == 0)"), TBlock.literal('Zero'), TBlock.closeBlock], output);
 
-		output = parser.parse('{# if a == 0}Zero{#elseif a == 1 && b == 2}One{#else}Above{#}');
+		// if/else if/else
+		output = parser.parse('{# if (a == 0)}Zero{#else if (a == 1 && b == 2)}One{#else}Above{#}');
 		Assert.same([
-			TBlock.ifBlock("a == 0"), 
-			TBlock.literal('Zero'), 
-			TBlock.elseifBlock("a == 1 && b == 2"), 
-			TBlock.literal('One'), 
+			TBlock.ifBlock("(a == 0)"),
+			TBlock.literal('Zero'),
+			TBlock.elseifBlock("(a == 1 && b == 2)"),
+			TBlock.literal('One'),
 			TBlock.elseBlock,
 			TBlock.literal('Above'), 
 			TBlock.closeBlock,
 		], output);
 		
-		output = parser.parse('{#for u in users}{$u.name}<br>{#}');
+		// for
+		output = parser.parse('{#for (u in users) }{$u.name}<br>{#}');
 		Assert.same([
-			TBlock.forBlock("u in users"), 
-			TBlock.printBlock('u.name'), 
-			TBlock.literal('<br>'), 
+			TBlock.forBlock("(u in users)"),
+			TBlock.printBlock('u.name'),
+			TBlock.literal('<br>'),
 			TBlock.closeBlock,
 		], output);
-
-		output = parser.parse('{#if a == "Evil {#if}"}Evil{#}');
+		
+		// while
+		output = parser.parse('{#while ( a > 0 ) }{? a--; }{#}');
 		Assert.same([
-			TBlock.ifBlock('a == "Evil {#if}"'),
-			TBlock.literal('Evil'),
+			TBlock.whileBlock("( a > 0 )"),
+			TBlock.codeBlock('a--;'),
 			TBlock.closeBlock,
-		], output);		
+		], output);
 	}
 	
 	public function test_If_parsing_exceptions_are_thrown()
@@ -127,7 +131,7 @@ class TestHTemplateParser
 		
 		// Unclosed tags
 		Assert.raises(function() {
-			self.parser.parse('{#if incompleted == true');
+			self.parser.parse('{#if (incompleted == true)');
 		});
 		
 		Assert.raises(function() {
@@ -140,7 +144,12 @@ class TestHTemplateParser
 		});
 		
 		Assert.raises(function() {
-			self.parser.parse("{#if a == 'Oops}");
+			self.parser.parse("{#if(a == 'Oops)}");
+		});
+		
+		// Invalid open block (case sensitive)
+		Assert.raises(function() {
+			self.parser.parse('{# IF(a == 2)}');
 		});
 	}
 }

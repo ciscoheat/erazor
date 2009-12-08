@@ -14,7 +14,7 @@ class HTemplate
 		this.template = template;
 	}
 	
-	public function execute(content : PropertyObject) : String
+	public function execute(?content : PropertyObject) : String
 	{
 		var buffer = new StringBuf();
 		

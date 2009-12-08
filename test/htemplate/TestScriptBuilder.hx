@@ -37,9 +37,9 @@ class TestScriptBuilder
 	public function test_If_keyword_TBlocks_are_assembled_correctly()
 	{
 		var input = [
-			TBlock.ifBlock("a == 0"), 
+			TBlock.ifBlock("(a == 0)"),
 			TBlock.literal('Zero'), 
-			TBlock.elseifBlock("a == 1 && b == 2"), 
+			TBlock.elseifBlock("(a == 1 && b == 2)"), 
 			TBlock.literal('One'), 
 			TBlock.elseBlock,
 			TBlock.literal('Above'), 
@@ -60,7 +60,7 @@ class TestScriptBuilder
 	public function test_If_for_TBlocks_are_assembled_correctly()
 	{
 		var input = [
-			TBlock.forBlock("u in users"), 
+			TBlock.forBlock("(u in users)"), 
 			TBlock.printBlock('u.name'),
 			TBlock.literal('<br>'), 
 			TBlock.closeBlock
