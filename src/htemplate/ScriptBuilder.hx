@@ -26,7 +26,7 @@ class ScriptBuilder
 		{
 			buffer.add(blockToString(block));
 		}
-		
+
 		return buffer.toString();
 	}
 	
@@ -62,6 +62,13 @@ class ScriptBuilder
 			
 			case printBlock(s):
 				return context + '.' + concatMethod + "(" + s + ");\n";
+				
+			// Capture blocks
+			case captureBlock:
+				return context + " = __string_buf__(" + context + ");\n";
+				
+			case restoreCapture(v):
+				return v + " = " + context + ".toString();\n" + context + " = __restore_buf__();\n";
 		}		
 	}
 }

@@ -16,6 +16,10 @@ enum TBlock
 	forBlock(s : String);
 	whileBlock(s : String);
 	
+	// Capture blocks
+	captureBlock;
+	restoreCapture(v : String);
+	
 	// And the closing block for the keywords
 	closeBlock;
 	
@@ -36,10 +40,11 @@ class HTemplateParser
 		{ keyword : 'whileBlock', pattern : ~/^{#\s*while\b/},
 	];
 
+	private var captureStack : Array<String>;
 	
 	public function new() 
 	{
-		
+		captureStack = [];
 	}
 	
 	/**
@@ -56,7 +61,7 @@ class HTemplateParser
 		{
 			var peek = template.charAt(next + 1);
 			
-			if(peek == '#' || peek == '$' || peek == '?')
+			if(peek == '#' || peek == '$' || peek == '?' || peek == '!')
 			{
 				return next;
 			}
@@ -119,7 +124,7 @@ class HTemplateParser
 			}
 		}
 		
-		throw 'Failed to find a closing delimiter for the script block.';
+		throw 'Failed to find a closing delimiter for the script block: ' + scriptPart.substr(0, 100) + " ...";
 	}
 	
 	private function parseBlock(template : String) : { block : TBlock, length : Int }
@@ -151,6 +156,12 @@ class HTemplateParser
 		{
 			return { block: TBlock.closeBlock, length: 3 };
 		}
+
+		// So is restoreCapture
+		if(template.substr(0, 3) == '{!}')
+		{
+			return { block: TBlock.restoreCapture(captureStack.pop()), length: 3 };
+		}
 		
 		// Printblock - quite simple
 		if(template.charAt(1) == '$')
@@ -172,7 +183,7 @@ class HTemplateParser
 					
 					return { block: block, length: item.pattern.matched(0).length + script.length + 1 };
 				}
-			}			
+			}
 		}
 		
 		// codeBlock
@@ -181,6 +192,15 @@ class HTemplateParser
 			var script = parseScript(template.substr(2));
 			return { block: TBlock.codeBlock(StringTools.trim(script)), length: 2 + script.length + 1 };			
 		}
+		
+		// captureBlock
+		if(template.charAt(1) == '!')
+		{
+			var variable = parseScript(template.substr(2));
+			captureStack.push(StringTools.trim(variable));
+			return { block: TBlock.captureBlock, length: 2 + variable.length + 1 };			
+		}
+
 		
 		// nextBlockPos() prevents from coming here, but just in case.
 		throw 'No valid block type found: ' + template.substr(0, 100) + " ...";
@@ -199,6 +219,23 @@ class HTemplateParser
 			output.push(blockInfo.block);
 			template = template.substr(blockInfo.length);
 		}
+		
+		// Test if capture blocks matches up correctly.
+		var captureCount = 0;
+		for(block in output)
+		{
+			switch(block)
+			{
+				case captureBlock:
+					captureCount++;
+				case restoreCapture(_):
+					captureCount--;
+				default:
+			}
+		}
+		
+		if(captureCount != 0)
+			throw 'Unmatched capture blocks:' + template.substr(0, 100) + " ...";
 		
 		return output;
 	}

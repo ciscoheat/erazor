@@ -30,9 +30,20 @@ class HTemplate
 		
 		var interp = new hscript.Interp();
 		
+		var bufferStack = [];
+		
 		setInterpreterVars(interp, content);
 		
 		interp.variables.set('__b__', buffer); // Connect the buffer to the script
+		interp.variables.set('__string_buf__', function(current) {
+			bufferStack.push(current);
+			return new StringBuf();
+		});
+		
+		interp.variables.set('__restore_buf__', function() {
+			return bufferStack.pop();
+		});
+		
 		interp.execute(program);
 
 		// The buffer now holds the output.

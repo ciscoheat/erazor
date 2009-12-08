@@ -10,7 +10,7 @@ class TestHTemplate
 	{
 		
 	}
-	
+
 	public function setup()
 	{
 		
@@ -49,5 +49,17 @@ class TestHTemplate
 		
 		htemplate = new HTemplate("{? a = 10;}{#while(--a > 0)}{$a}{#}");
 		Assert.equals("987654321", htemplate.execute());
+	}
+	
+	public function test_If_captures_are_stored_correctly()
+	{
+		htemplate = new HTemplate("1{!v}haxe{!}2{$v}3");
+		Assert.equals("12haxe3", htemplate.execute());
+		
+		htemplate = new HTemplate(" {!v}haxe{!} {$uc(v)} ");
+		Assert.equals("  HAXE ", htemplate.execute( { uc : function(v) { return v.toUpperCase(); }}) );
+		
+		htemplate = new HTemplate(" {!v1}ha{!v2}x{!}e{!} {$v1}{$v2}} ");
+		Assert.equals("  haex} ", htemplate.execute());
 	}
 }

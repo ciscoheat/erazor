@@ -89,6 +89,29 @@ class TestHTemplateParser
 		], output);		
 	}
 
+	public function test_If_captures_are_parsed_correctly()
+	{
+		var output = parser.parse('{!v}haxe{!} {$uc(v)}');
+		Assert.same([
+			TBlock.captureBlock,
+			TBlock.literal('haxe'), 
+			TBlock.restoreCapture('v'), 
+			TBlock.literal(' '),
+			TBlock.printBlock('uc(v)')
+		], output);
+		
+		output = parser.parse('{!v1}ha{!v2}x{!}e{!}');
+		Assert.same([
+			TBlock.captureBlock,
+			TBlock.literal('ha'), 
+			TBlock.captureBlock,
+			TBlock.literal('x'), 
+			TBlock.restoreCapture('v2'), 
+			TBlock.literal('e'),
+			TBlock.restoreCapture('v1'), 
+		], output);
+	}
+
 	public function test_If_keyword_blocks_are_parsed_correctly()
 	{
 		// if
@@ -150,6 +173,15 @@ class TestHTemplateParser
 		// Invalid open block (case sensitive)
 		Assert.raises(function() {
 			self.parser.parse('{# IF(a == 2)}');
+		});
+		
+		// Unclosed captures
+		Assert.raises(function() {
+			self.parser.parse('{!v}');
+		});
+		
+		Assert.raises(function() {
+			self.parser.parse('{!v1}{!v2}{!}');
 		});
 	}
 }
