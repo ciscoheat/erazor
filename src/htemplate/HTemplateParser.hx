@@ -20,7 +20,9 @@ enum TBlock
 	
 	codeBlock(s : String);
 	printBlock(s : String);
+	
 	// TODO: Comment block {* *}
+	// TODO: Custom block (custom keywords, plugins)
 }
 
 class HTemplateParser 
@@ -159,8 +161,6 @@ class HTemplateParser
 				if(test.match(template))
 				{
 					var script = parseScript(template.substr(test.matched(0).length));
-					var blockType = Type.resolveEnum('TBlock.' + keyword + 'Block');
-					
 					var block = Type.createEnum(TBlock, keyword + 'Block', keyword == 'else' ? [] : [StringTools.trim(script)]);
 					
 					return { block: block, length: test.matched(0).length + script.length + 1 };
@@ -172,6 +172,7 @@ class HTemplateParser
 			return { block: TBlock.codeBlock(StringTools.trim(script)), length: 2 + script.length + 1 };
 		}
 		
+		// nextBlockPos() prevents from coming here, but just in case.
 		throw 'No valid block type found.';
 	}
 	

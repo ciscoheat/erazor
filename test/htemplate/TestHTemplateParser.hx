@@ -27,6 +27,10 @@ class TestHTemplateParser
 		// Plain text
 		var output = parser.parse('Hello there\nHow are you?');		
 		Assert.same([TBlock.literal("Hello there\nHow are you?")], output);
+		
+		// Javascript in the template
+		output = parser.parse('<script>if(document.getElementById("test")) { alert("ok"); }</script>');
+		Assert.same([TBlock.literal('<script>if(document.getElementById("test")) { alert("ok"); }</script>')], output);
 	}
 
 	public function test_If_literals_with_braces_are_parsed_correctly()
@@ -62,16 +66,16 @@ class TestHTemplateParser
 	public function test_If_codeblocks_are_parsed_correctly()
 	{
 		// Single codeblock
-		var output = parser.parse('Test: {# a == 0; Lib.print("Evil Bracke}"); }');
+		var output = parser.parse('Test: {#a = 0; Lib.print("Evil Bracke}"); }');
 		Assert.same([
 			TBlock.literal("Test: "),
-			TBlock.codeBlock('a == 0; Lib.print("Evil Bracke}");')
+			TBlock.codeBlock('a = 0; Lib.print("Evil Bracke}");')
 		], output);
 		
 		// Nested codeblock
-		var output = parser.parse('{# a == 0; if(b == 2) { Lib.print("Ok"); }}');
+		var output = parser.parse('{# a = 0; if(b == 2) { Lib.print("Ok"); }}');
 		Assert.same([
-			TBlock.codeBlock('a == 0; if(b == 2) { Lib.print("Ok"); }')
+			TBlock.codeBlock('a = 0; if(b == 2) { Lib.print("Ok"); }')
 		], output);		
 	}
 
@@ -80,7 +84,7 @@ class TestHTemplateParser
 		var output = parser.parse('Test: {#if a = 0}Zero{#}');
 		Assert.same([TBlock.literal("Test: "), TBlock.ifBlock("a = 0"), TBlock.literal('Zero'), TBlock.closeBlock], output);
 
-		output = parser.parse('{#if a == 0}Zero{#elseif a == 1 && b == 2}One{#else}Above{#}');
+		output = parser.parse('{# if a == 0}Zero{#elseif a == 1 && b == 2}One{#else}Above{#}');
 		Assert.same([
 			TBlock.ifBlock("a == 0"), 
 			TBlock.literal('Zero'), 
@@ -105,5 +109,17 @@ class TestHTemplateParser
 			TBlock.literal('Evil'),
 			TBlock.closeBlock,
 		], output);		
+	}
+	
+	public function test_If_parsing_exceptions_are_thrown()
+	{
+		var self = this;
+		Assert.raises(function() {
+			self.parser.parse('{#if incompleted == true');
+		});
+		
+		Assert.raises(function() {
+			self.parser.parse('{$echo{{');
+		});
 	}
 }
