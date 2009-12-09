@@ -10,12 +10,10 @@ package htemplate;
 class ScriptBuilder
 {
 	private var context : String;
-	private var concatMethod : String;
 
-	public function new(context : String, concatMethod : String)
+	public function new(context : String)
 	{
 		this.context = context;
-		this.concatMethod = concatMethod;
 	}
 	
 	public function build(blocks : Array<TBlock>) : String
@@ -32,12 +30,12 @@ trace(buffer.toString());
 	
 	public function blockToString(block : TBlock) : String
 	{
-		var output = context + '.' + concatMethod + '(';
+		var output = context + '.add(';
 		
 		switch(block)
 		{
 			case literal(s):
-				return context + '.' + concatMethod + "('" + StringTools.replace(s, "'", "\\'") + "');\n";
+				return context + ".add('" + StringTools.replace(s, "'", "\\'") + "');\n";
 			
 			case ifBlock(s):
 				return "if" + s + " {\n";
@@ -61,7 +59,7 @@ trace(buffer.toString());
 				return s + "\n";
 			
 			case printBlock(s):
-				return context + '.' + concatMethod + "(" + s + ");\n";
+				return context + ".add(" + s + ");\n";
 				
 			// Capture blocks
 			case captureBlock:

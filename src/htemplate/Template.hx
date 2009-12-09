@@ -1,5 +1,7 @@
 ﻿package htemplate;
 
+import hscript.Interp;
+
 /**
  * Can be any object with properties or a Hash.
  */
@@ -22,7 +24,7 @@ class Template
 		var parsedBlocks = new Parser().parse(template);
 		
 		// Make a hscript with the buffer as context.
-		var script = new ScriptBuilder('__b__', 'add').build(parsedBlocks);
+		var script = new ScriptBuilder('__b__').build(parsedBlocks);
 		
 		// Make hscript parse and interpret the script.
 		var parser = new hscript.Parser();
@@ -50,7 +52,7 @@ class Template
 		return buffer.toString();
 	}
 	
-	private function setInterpreterVars(interp : hscript.Interp, content : PropertyObject) : Void
+	private function setInterpreterVars(interp : Interp, content : PropertyObject) : Void
 	{
 		if(Std.is(content, Hash))
 		{
