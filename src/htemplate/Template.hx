@@ -11,6 +11,8 @@ class Template
 {
 	private var template : String;
 	
+	public var variables(default, null) : Hash<Dynamic>;
+	
 	public function new(template : String)
 	{
 		this.template = template;
@@ -31,6 +33,8 @@ class Template
 		var program = parser.parseString(script);
 		
 		var interp = new hscript.Interp();
+		
+		variables = interp.variables;
 		
 		var bufferStack = [];
 		
