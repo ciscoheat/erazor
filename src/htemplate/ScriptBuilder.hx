@@ -1,11 +1,4 @@
-﻿/**
- * ...
- * @author $(DefaultUser)
- */
-
-package htemplate;
-
-//import htemplate.Parser;
+﻿package htemplate;
 
 class ScriptBuilder
 {

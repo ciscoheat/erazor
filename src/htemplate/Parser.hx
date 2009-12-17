@@ -2,56 +2,15 @@
 
 class Parser
 {
-	/*
-	static var openBlocks = [
-		{ keyword : 'ifBlock', pattern : ~/^{#\s*if\b/},
-		{ keyword : 'elseifBlock', pattern : ~/^{#\s*else\s+if\b/},
-		{ keyword : 'elseBlock', pattern : ~/^{#\s*else\b/},
-		{ keyword : 'forBlock', pattern : ~/^{#\s*for\b/},
-		{ keyword : 'whileBlock', pattern : ~/^{#\s*while\b/},
-	];
-	*/
-
-//	private var captureStack : Array<String>;
 	private var blocksStack : Array<TBlock>;
 	private var codeBuf : StringBuf;
 	public function new()
 	{
-//		captureStack = [];
 		blocksStack = [];
 	}
 	
 	/**
-	 * Returns the position of the next TBlock, or -1 if not found.
-	 * A TBlock always starts with {# or {:
-	 * @param	template
-	 * @return
-	 */
-	/*
-	private function nextBlockPos(template : String) : Int
-	{
-		var next = template.indexOf('{');
-
-		while(next >= 0)
-		{
-			
-			var peek = template.charAt(next + 1);
-			
-			if(peek == '#' || peek == ':' || peek == '?' || peek == '!')
-			{
-				return next;
-			}
-			else
-			{
-				next = template.indexOf('{', next + 1);
-			}
-		}
-		
-		return next;
-	}
-*/
-	/**
-	 * Parse a script block (one starting with {# or {:, taking strings and other braces into account.
+	 * Parse a script block taking strings and other braces into account.
 	 * @param	scriptPart
 	 * @return
 	 */
@@ -116,8 +75,6 @@ class Parser
 	
 	private function parseBlock(blockType : String, template : String) : { block : TBlock, length : Int }
 	{
-		
-		// TODO: Alternate delimiter syntax
 		switch(blockType)
 		{
 			case ':':
@@ -173,6 +130,11 @@ class Parser
 	
 	static var validBlock = ~/\{([:?]|if|else if|else|for|while|set|eval|end)/;
 	
+	/**
+	 * Takes a template string as input and returns an AST made of TBlock instances.
+	 * @param	template
+	 * @return
+	 */
 	public function parse(template : String) : Array<TBlock>
 	{
 		var output = new Array<TBlock>();
@@ -199,35 +161,5 @@ class Parser
 			output.push(TBlock.literal(template));
 		}
 		return output;
-		/*
-		while(template.length > 0)
-		{
-			var blockInfo = parseBlock(template);
-			
-			// The blockinfo contains the next block and the length of it.
-			// Push it to the output and shorten the template string.
-			output.push(blockInfo.block);
-			template = template.substr(blockInfo.length);
-		}
-		
-		// Test if capture blocks matches up correctly.
-		var captureCount = 0;
-		for(block in output)
-		{
-			switch(block)
-			{
-				case captureBlock:
-					captureCount++;
-				case restoreCapture(_):
-					captureCount--;
-				default:
-			}
-		}
-		
-		if(captureCount != 0)
-			throw 'Unmatched capture blocks:' + template.substr(0, 100) + " ...";
-		
-		return output;
-		*/
 	}
 }
