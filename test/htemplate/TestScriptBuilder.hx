@@ -21,7 +21,7 @@ class TestScriptBuilder
 	
 	public function setup()
 	{
-		builder = new ScriptBuilder('__b__', 'add');
+		builder = new ScriptBuilder('__b__');
 	}
 	
 	public function test_If_print_and_literal_TBlocks_are_assembled_correctly()
@@ -37,9 +37,9 @@ class TestScriptBuilder
 	public function test_If_keyword_TBlocks_are_assembled_correctly()
 	{
 		var input = [
-			TBlock.ifBlock("(a == 0)"),
+			TBlock.ifBlock("a == 0"),
 			TBlock.literal('Zero'),
-			TBlock.elseifBlock("(a == 1 && b == 2)"),
+			TBlock.elseifBlock("a == 1 && b == 2"),
 			TBlock.literal('One'),
 			TBlock.elseBlock,
 			TBlock.literal('Above'),
@@ -60,7 +60,7 @@ class TestScriptBuilder
 	public function test_If_for_TBlocks_are_assembled_correctly()
 	{
 		var input = [
-			TBlock.forBlock("(u in users)"),
+			TBlock.forBlock("u in users"),
 			TBlock.printBlock('u.name'),
 			TBlock.literal('<br>'),
 			TBlock.closeBlock
@@ -92,9 +92,9 @@ class TestScriptBuilder
 	public function test_If_captures_are_assembled_correctly()
 	{
 		var input = [
-			TBlock.captureBlock,
+			TBlock.captureBlock('a'),
 			TBlock.literal('haxe'),
-			TBlock.restoreCapture('v'),
+			TBlock.captureCloseBlock('v'),
 			TBlock.literal(' '),
 			TBlock.printBlock('uc(v)')
 		];
@@ -109,13 +109,13 @@ class TestScriptBuilder
 			], builder.build(input));
 		
 		input = [
-			TBlock.captureBlock,
+			TBlock.captureBlock('a'),
 			TBlock.literal('ha'),
-			TBlock.captureBlock,
+			TBlock.captureBlock('b'),
 			TBlock.literal('x'),
-			TBlock.restoreCapture('v2'),
+			TBlock.captureCloseBlock('v2'),
 			TBlock.literal('e'),
-			TBlock.restoreCapture('v1')
+			TBlock.captureCloseBlock('v1')
 		];
 		
 		assertScript([

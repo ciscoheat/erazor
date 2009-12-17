@@ -12,12 +12,12 @@ enum TBlock
 	whileBlock(s : String);
 	
 	// Capture blocks
-	captureBlock;
-	restoreCapture(v : String);
+	captureBlock(v : String);
+	captureCloseBlock(v : String);
 	
 	// And the closing block for the keywords
 	closeBlock;
-	
+
 	codeBlock(s : String);
 	printBlock(s : String);
 	

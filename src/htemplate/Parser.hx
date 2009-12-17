@@ -2,6 +2,7 @@
 
 class Parser
 {
+	/*
 	static var openBlocks = [
 		{ keyword : 'ifBlock', pattern : ~/^{#\s*if\b/},
 		{ keyword : 'elseifBlock', pattern : ~/^{#\s*else\s+if\b/},
@@ -9,29 +10,34 @@ class Parser
 		{ keyword : 'forBlock', pattern : ~/^{#\s*for\b/},
 		{ keyword : 'whileBlock', pattern : ~/^{#\s*while\b/},
 	];
+	*/
 
-	private var captureStack : Array<String>;
-	
+//	private var captureStack : Array<String>;
+	private var blocksStack : Array<TBlock>;
+	private var codeBuf : StringBuf;
 	public function new()
 	{
-		captureStack = [];
+//		captureStack = [];
+		blocksStack = [];
 	}
 	
 	/**
 	 * Returns the position of the next TBlock, or -1 if not found.
-	 * A TBlock always starts with {# or {$
+	 * A TBlock always starts with {# or {:
 	 * @param	template
 	 * @return
 	 */
+	/*
 	private function nextBlockPos(template : String) : Int
 	{
 		var next = template.indexOf('{');
 
 		while(next >= 0)
 		{
+			
 			var peek = template.charAt(next + 1);
 			
-			if(peek == '#' || peek == '$' || peek == '?' || peek == '!')
+			if(peek == '#' || peek == ':' || peek == '?' || peek == '!')
 			{
 				return next;
 			}
@@ -43,9 +49,9 @@ class Parser
 		
 		return next;
 	}
-
+*/
 	/**
-	 * Parse a script block (one starting with {# or {$, taking strings and other braces into account.
+	 * Parse a script block (one starting with {# or {:, taking strings and other braces into account.
 	 * @param	scriptPart
 	 * @return
 	 */
@@ -97,89 +103,103 @@ class Parser
 		throw 'Failed to find a closing delimiter for the script block: ' + scriptPart.substr(0, 100) + " ...";
 	}
 	
-	private function parseBlock(template : String) : { block : TBlock, length : Int }
+	private function cleanCondition(s : String)
 	{
-		// TODO: Alternate delimiter syntax
-		
-		var nextPos = nextBlockPos(template);
-		
-		// If no code block is at first position, return a literal block.
-		if(nextPos > 0)
+		s = StringTools.trim(s);
+		if (s.substr(0, 1) == '(')
 		{
-			return {
-				block: TBlock.literal(template.substr(0, nextPos)),
-				length: nextPos
-			};
+			s = s.substr(1, s.length - 2);
+			s = StringTools.trim(s);
 		}
-
-		// No code block found, this will be the last block in the parsing.
-		if(nextPos == -1)
-		{
-			return {
-				block: TBlock.literal(template),
-				length: template.length
-			};
-		}
-
-		// A closeBlock is simple
-		if(template.substr(0, 3) == '{#}')
-		{
-			return { block: TBlock.closeBlock, length: 3 };
-		}
-
-		// So is restoreCapture
-		if(template.substr(0, 3) == '{!}')
-		{
-			return { block: TBlock.restoreCapture(captureStack.pop()), length: 3 };
-		}
-		
-		// Printblock - quite simple
-		if(template.charAt(1) == '$')
-		{
-			var script = parseScript(template.substr(2));
-			return { block: TBlock.printBlock(StringTools.trim(script)), length: 2 + script.length + 1 };
-		}
-
-		// openBlock
-		if(template.charAt(1) == '#')
-		{
-			// Test whether the block is an open block {#if, {#for ... {#} or a codeblock.
-			for(item in openBlocks)
-			{
-				if(item.pattern.match(template))
-				{
-					var script = parseScript(template.substr(item.pattern.matched(0).length));
-					var block = Type.createEnum(TBlock, item.keyword, item.keyword == 'elseBlock' ? [] : [StringTools.trim(script)]);
-					
-					return { block: block, length: item.pattern.matched(0).length + script.length + 1 };
-				}
-			}
-		}
-		
-		// codeBlock
-		if(template.charAt(1) == '?')
-		{
-			var script = parseScript(template.substr(2));
-			return { block: TBlock.codeBlock(StringTools.trim(script)), length: 2 + script.length + 1 };
-		}
-		
-		// captureBlock
-		if(template.charAt(1) == '!')
-		{
-			var variable = parseScript(template.substr(2));
-			captureStack.push(StringTools.trim(variable));
-			return { block: TBlock.captureBlock, length: 2 + variable.length + 1 };
-		}
-
-		
-		// nextBlockPos() prevents from coming here, but just in case.
-		throw 'No valid block type found: ' + template.substr(0, 100) + " ...";
+		return s;
 	}
+	
+	private function parseBlock(blockType : String, template : String) : { block : TBlock, length : Int }
+	{
+		
+		// TODO: Alternate delimiter syntax
+		switch(blockType)
+		{
+			case ':':
+				var script = parseScript(template);
+				return { block: TBlock.printBlock(StringTools.trim(script)), length: script.length + 1 };
+			case '?':
+				var script = parseScript(template);
+				return { block: TBlock.codeBlock(StringTools.trim(script)), length: script.length + 1 };
+			case 'if', 'for', 'while':
+				var script = parseScript(template);
+				var block = Type.createEnum(TBlock, blockType + "Block", blockType == 'else' ? [] : [cleanCondition(script)]);
+				blocksStack.push(block);
+				return { block: block, length: script.length + 1 };
+			case 'else if':
+				var script = parseScript(template);
+				var block = TBlock.elseifBlock(cleanCondition(script));
+				return { block: block, length: script.length + 1 };
+			case 'else':
+				var script = parseScript(template);
+				var block = TBlock.elseBlock;
+				return { block: block, length: script.length + 1 };
+			case 'set':
+				var variable = parseScript(template);
+				var block = TBlock.captureBlock(StringTools.trim(variable));
+				blocksStack.push(block);
+				return { block: block, length: variable.length + 1 };
+			case 'eval':
+				var variable = parseScript(template);
+				var block = TBlock.codeBlock(null);
+				blocksStack.push(block);
+				codeBuf = new StringBuf();
+				return { block: null, length: variable.length + 1 };
+			case 'end':
+				var block = blocksStack.pop();
+				if (null == block) throw "unbalanced block ends";
+				switch(block)
+				{
+					case ifBlock(_), forBlock(_), whileBlock(_):
+						return { block: TBlock.closeBlock, length: 1 };
+					case captureBlock(n):
+						return { block: TBlock.captureCloseBlock(n), length: 1 };
+						case codeBlock(_):
+						var block = TBlock.codeBlock(StringTools.trim(codeBuf.toString()));
+						codeBuf = null;
+						return { block: block, length: 1 };
+					default:
+					throw "invalid block type in stack: " + block;
+				}
+			default:
+				throw "invalid blockType: " + blockType; // should never happen
+		}
+	}
+	
+	static var validBlock = ~/\{([:?]|if|else if|else|for|while|set|eval|end)/;
 	
 	public function parse(template : String) : Array<TBlock>
 	{
 		var output = new Array<TBlock>();
 		
+		while (validBlock.match(template))
+		{
+			var left = validBlock.matchedLeft(); // not sure if it returns null consistently
+			if (null != left && '' != left)
+			{
+				if (null != codeBuf)
+					codeBuf.add(left);
+				else
+					output.push(TBlock.literal(left));
+			}
+			var block = parseBlock(validBlock.matched(1), validBlock.matchedRight());
+			if(null != block.block)
+				output.push(block.block);
+			template = validBlock.matchedRight().substr(block.length);
+		}
+		if (blocksStack.length > 0)
+			throw "some blocks have not been correctly closed";
+		if ("" != template)
+		{
+			output.push(TBlock.literal(template));
+		}
+		return output;
+		/*
 		while(template.length > 0)
 		{
 			var blockInfo = parseBlock(template);
@@ -208,5 +228,6 @@ class Parser
 			throw 'Unmatched capture blocks:' + template.substr(0, 100) + " ...";
 		
 		return output;
+		*/
 	}
 }
