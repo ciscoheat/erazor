@@ -1,7 +1,7 @@
 ﻿class Main
 {
   static var TEMPLATE =
-"{?
+"{eval}
   ucwords = function(s) {
     var r = '';
     var arr = s.split(' ');
@@ -18,18 +18,18 @@
     else
       1;
   });
-}
-{! line}{$repeat('=', title.length)}{!}
+{end}
+{set line}{:repeat('=', title.length)}{end}
 
-{$ line}
-{$ ucwords(title)}
-{$ line }
+{: line}
+{: ucwords(title)}
+{: line }
 
-{$ content.substr(0, 40)}...
+{: content.substr(0, 40)}...
 
-{# for (item in list) }
-  * {# if(item.sex == 'f')}Ms.{#else}Mr.{#} {$item.name}
-{#}
+{for item in list}
+  * {if(item.sex == 'f')}Ms.{else}Mr.{end} {: item.name}
+{end}
 
 ";
   static function main()

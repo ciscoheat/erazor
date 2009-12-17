@@ -20,7 +20,7 @@
   <build>
     <option directives="" />
     <option flashStrict="False" />
-    <option mainClass="TestAll" />
+    <option mainClass="Main" />
     <option override="False" />
     <option verbose="False" />
     <option additional="" />
