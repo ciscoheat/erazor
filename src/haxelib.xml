@@ -1,0 +1,7 @@
+<project name="htemplate" url="http://github.com/ciscoheat/htemplate" license="LGPL">
+    <user name="fponticelli"/>
+	<tag v="cross"/>
+	<tag v="template" />
+    <description>Template System</description>
+    <version name="0.1.0">First Release</version>
+</project>

@@ -1,6 +1,7 @@
 ﻿package htemplate;
 
 import hscript.Interp;
+import htemplate.hscript.EnhancedInterp;
 
 /**
  * Can be any object with properties or a Hash.
@@ -32,7 +33,7 @@ class Template
 		var parser = new hscript.Parser();
 		var program = parser.parseString(script);
 		
-		var interp = new hscript.Interp();
+		var interp = new EnhancedInterp();
 		
 		variables = interp.variables;
 		

@@ -2,22 +2,14 @@
 {
   static var TEMPLATE =
 "{eval}
-  ucwords = function(s) {
+  function ucwords(s) {
     var r = '';
     var arr = s.split(' ');
     for (v in arr)
       r += v.substr(0, 1).toUpperCase() + v.substr(1, v.length-1) + ' ';
     return r;
   };
-
-  list.sort(function(a, b) {
-    if (a.name == b.name)
-      return 0;
-    else if (a.name < b.name)
-      return -1
-    else
-      1;
-  });
+  sortArray(list);
 {end}
 {set line}{:repeat('=', title.length)}{end}
 
@@ -45,9 +37,21 @@
 		repeat  : function(v, l) {
 		  return StringTools.lpad('', v, l);
 		},
+		sortArray : function(arr) {
+			arr.sort(function(a, b) {
+				if (a.name == b.name)
+				  return 0;
+				else if (a.name < b.name)
+				  return -1
+				else
+				  return 1;
+			});
+		}
 	};
 
     var template = new htemplate.Template(TEMPLATE);
-    trace(template.execute(h));
+#if php
+    php.Lib.print(template.execute(h));
+#end
   }
 }

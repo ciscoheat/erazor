@@ -9,7 +9,7 @@
 		runner.addCase(new htemplate.TestScriptBuilder());
 		runner.addCase(new htemplate.TestTemplate());
 		
-		var report = new utest.ui.text.TraceReport(runner);
+		var report = new utest.ui.text.PrintReport(runner);
 		runner.run();
 	}
 }
