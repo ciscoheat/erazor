@@ -20,9 +20,8 @@
   <build>
     <option directives="" />
     <option flashStrict="False" />
-    <option mainClass="Main" />
-    <option override="False" />
-    <option verbose="False" />
+    <option mainClass="TestAll" />
+    <option enabledebug="False" />
     <option additional="" />
   </build>
   <!-- haxelib libraries -->
