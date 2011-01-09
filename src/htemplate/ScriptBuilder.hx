@@ -17,7 +17,6 @@ class ScriptBuilder
 		{
 			buffer.add(blockToString(block));
 		}
-//trace(buffer.toString());
 		return buffer.toString();
 	}
 	

@@ -4,7 +4,7 @@
   <output>
     <movie disabled="False" />
     <movie input="" />
-    <movie path="bin/htemplate.swf" />
+    <movie path="bin\htemplate.swf" />
     <movie fps="0" />
     <movie width="600" />
     <movie height="600" />
@@ -21,8 +21,7 @@
     <option directives="" />
     <option flashStrict="False" />
     <option mainClass="Main" />
-    <option override="False" />
-    <option verbose="False" />
+    <option enabledebug="False" />
     <option additional="" />
   </build>
   <!-- haxelib libraries -->
