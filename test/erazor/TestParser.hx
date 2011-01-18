@@ -100,6 +100,23 @@ class TestParser
 			TBlock.codeBlock('a = 0; if(b == 2) { Lib.print("a@b"); }')
 		], output);
 	}
+	
+	public function test_More_complicated_variables()
+	{
+		var output : Array<TBlock>;
+		
+		output = parser.parse('@custom(0, 10, "test(")');
+		Assert.same([TBlock.printBlock('custom(0, 10, "test(")')], output);
+		
+		output = parser.parse('@test[a+1]');
+		Assert.same([TBlock.printBlock("test[a+1]")], output);
+		
+		output = parser.parse('@test.users[user.id]');
+		Assert.same([TBlock.printBlock('test.users[user.id]')], output);
+		
+		output = parser.parse('@test.user.id');
+		Assert.same([TBlock.printBlock('test.user.id')], output);
+	}
 
 	public function test_If_keyword_blocks_are_parsed_correctly()
 	{

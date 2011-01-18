@@ -107,9 +107,22 @@ class Parser
 		return { block: TBlock.codeBlock(str.substr(1)), length: str.length };
 	}
 	
-	function parseVariable(template : String) : Block
+	function parseVariable(template : String, brace : String) : Block
 	{
-		var str = parseString(template.substr(1), parseVariableChar, false);
+		var toParse = template.substr(1);
+		var str : String;
+		
+		if (brace != null)
+		{
+			// Supported braces are () and []
+			var endBrace = (brace == '(') ? ')' : ']';
+			str = parseScriptPart(toParse, brace, endBrace);
+		}
+		else
+		{
+			str = parseString(toParse, parseVariableChar, false);
+		}
+		
 		return { block: TBlock.printBlock(str), length: str.length + 1 };
 	}
 
@@ -147,7 +160,7 @@ class Parser
 		
 		// Test for variable like @name
 		if (variableMatch.match(template))
-			return parseVariable(template);
+			return parseVariable(template, variableMatch.matched(1));
 			
 		// Test for code or print block @{ or @(
 		var startBrace = template.charAt(1);		
@@ -280,7 +293,7 @@ class Parser
 		// Some are quite simple, could be made with string functions instead for speed
 		condMatch = ~/^@(?:if|for|while)\b/;
 		inConditionalMatch = ~/^(?:\}[\s\r\n]*else if\b|\}[\s\r\n]*else[\s\r\n]*{)/;
-		variableMatch = ~/^@[_A-Za-z]/;
-		variableChar = ~/^[\w\[\]"'\.]$/;
+		variableMatch = ~/^@[_A-Za-z][\w\.]*([\(\[])?/;
+		variableChar = ~/^[_\w\.]$/;
 	}
 }
