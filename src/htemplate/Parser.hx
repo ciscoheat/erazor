@@ -90,7 +90,7 @@ class Parser
 			}
 		}
 		
-		trace(startBrace); trace(endBrace);
+		//trace(startBrace); trace(endBrace);
 		throw 'Failed to find a closing delimiter for the script block: ' + template.substr(0, 100);
 	}
 	
@@ -123,7 +123,7 @@ class Parser
 	 */
 	function parseBlock(template : String) : Block
 	{
-		trace(">>> " + (template.length > 30 ? template.substr(0, 30) + '...' : template));
+		//trace(">>> " + (template.length > 30 ? template.substr(0, 30) + '...' : template));
 		return (context == ParseContext.code) ? parseCodeBlock(template) : parseLiteral(template);
 	}
 
@@ -159,13 +159,11 @@ class Parser
 			// It may not be an end, just a continuation
 			if (inConditionalMatch.match(template))
 			{
-				trace("INCONDITIONAL MATCH");
-				
 				var str = parseScriptPart(template, '', '{');
 				return { block: TBlock.codeBlock(str), length: str.length };
 			}
 			
-			trace("--conditionalStack");
+			//trace("--conditionalStack");
 			--conditionalStack;
 			
 			return { block: TBlock.codeBlock('}'), length: 1 };
@@ -174,7 +172,7 @@ class Parser
 		// Test for conditional code block
 		if (condMatch.match(template))
 		{
-			trace("++conditionalStack");			
+			//trace("++conditionalStack");
 			++conditionalStack;
 			
 			return parseConditional(template);
@@ -242,7 +240,7 @@ class Parser
 		var nextAt = template.indexOf(Parser.at);
 		var nextBracket = this.conditionalStack > 0 ? template.indexOf('}') : -1;
 		
-		trace("nextAt: " + nextAt + ", nextBracket: " + nextBracket);
+		//trace("nextAt: " + nextAt + ", nextBracket: " + nextBracket);
 
 		while (nextAt >= 0 || nextBracket >= 0)
 		{
