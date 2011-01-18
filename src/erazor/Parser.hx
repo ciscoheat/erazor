@@ -1,4 +1,4 @@
-﻿package htemplate;
+﻿package erazor;
 
 private typedef Block = {
 	var block : TBlock;

@@ -4,11 +4,11 @@
   <output>
     <movie disabled="False" />
     <movie input="" />
-    <movie path="bin\htemplate.n" />
+    <movie path="bin\erazor.swf" />
     <movie fps="0" />
-    <movie width="0" />
-    <movie height="0" />
-    <movie version="12" />
+    <movie width="600" />
+    <movie height="600" />
+    <movie version="9" />
     <movie background="#FFFFFF" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
@@ -20,7 +20,7 @@
   <build>
     <option directives="" />
     <option flashStrict="False" />
-    <option mainClass="TestAll" />
+    <option mainClass="Main" />
     <option enabledebug="False" />
     <option additional="" />
   </build>
@@ -33,6 +33,10 @@
   <compileTargets>
     <compile path="src\Main.hx" />
   </compileTargets>
+  <!-- Assets to embed into the output SWF -->
+  <library>
+    <!-- example: <asset path="..." id="..." update="..." glyphs="..." mode="..." place="..." sharepoint="..." /> -->
+  </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <!-- example: <hidden path="..." /> -->
@@ -44,7 +48,6 @@
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
-    <option testMovie="Custom" />
-    <option testMovieCommand="run.bat" />
+    <option testMovie="Default" />
   </options>
 </project>

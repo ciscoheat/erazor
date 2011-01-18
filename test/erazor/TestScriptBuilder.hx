@@ -3,10 +3,10 @@
  * @author $(DefaultUser)
  */
 
-package htemplate;
+package erazor;
 
-import htemplate.Parser;
-import htemplate.ScriptBuilder;
+import erazor.Parser;
+import erazor.ScriptBuilder;
 
 import utest.Assert;
 

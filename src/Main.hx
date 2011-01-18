@@ -26,7 +26,7 @@
   static function main()
   {
 	var h = {
-		title   : 'htemplate - the template system for haxe',
+		title   : 'erazor - the template system for haxe',
 		content : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ullamcorper felis non libero blandit facilisis. In hac habitasse platea dictumst',
 		list    : [
 		  { sex : 'm', name : 'Boris' },
@@ -49,7 +49,7 @@
 		}
 	};
 
-    var template = new htemplate.Template(TEMPLATE);
+    var template = new erazor.Template(TEMPLATE);
 #if php
     php.Lib.print(template.execute(h));
 #end

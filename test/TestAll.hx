@@ -4,10 +4,10 @@
 	{
 		var runner = new utest.Runner();
 		
-		runner.addCase(new htemplate.TestParser());
-		runner.addCase(new htemplate.TestScriptBuilder());
-		runner.addCase(new htemplate.TestTemplate());
-		//runner.addCase(new htemplate.TestEnhancedInterp());
+		runner.addCase(new erazor.TestParser());
+		runner.addCase(new erazor.TestScriptBuilder());
+		runner.addCase(new erazor.TestTemplate());
+		//runner.addCase(new erazor.TestEnhancedInterp());
 		
 		var report = new utest.ui.text.PrintReport(runner);
 		runner.run();

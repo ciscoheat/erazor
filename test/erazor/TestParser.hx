@@ -3,9 +3,9 @@
  * @author $(DefaultUser)
  */
 
-package htemplate;
+package erazor;
 
-import htemplate.Parser;
+import erazor.Parser;
 import utest.Assert;
 
 class TestParser

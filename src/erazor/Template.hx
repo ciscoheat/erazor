@@ -1,7 +1,7 @@
-﻿package htemplate;
+﻿package erazor;
 
 import hscript.Interp;
-import htemplate.hscript.EnhancedInterp;
+import erazor.hscript.EnhancedInterp;
 
 /**
  * Can be any object with properties or a Hash.

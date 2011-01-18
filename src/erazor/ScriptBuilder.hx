@@ -1,4 +1,4 @@
-﻿package htemplate;
+﻿package erazor;
 
 class ScriptBuilder
 {

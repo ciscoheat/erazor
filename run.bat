@@ -1,2 +1,2 @@
 @echo off
-neko bin\htemplate.n
+neko bin\erazor.n

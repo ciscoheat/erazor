@@ -1,7 +1,7 @@
-<project name="htemplate" url="http://github.com/ciscoheat/htemplate" license="LGPL">
+<project name="erazor" url="http://github.com/ciscoheat/erazor" license="MIT">
     <user name="fponticelli"/>
 	<tag v="cross"/>
 	<tag v="template" />
-    <description>Template System</description>
+    <description>A haXe implementation of the MVC 3 Razor view engine</description>
     <version name="0.1.0">First Release</version>
 </project>
