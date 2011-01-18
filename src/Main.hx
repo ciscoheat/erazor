@@ -1,7 +1,7 @@
 ﻿class Main
 {
   static var TEMPLATE =
-"{eval}
+"@{
   function ucwords(s) {
     var r = '';
     var arr = s.split(' ');
@@ -10,18 +10,19 @@
     return r;
   };
   sortArray(list);
-{end}
-{set line}{:repeat('=', title.length)}{end}
+}
 
-{: line}
-{: ucwords(title)}
-{: line }
+@{ line = "------"; }
 
-{: content.substr(0, 40)}...
+@(line + "---")
+@ucwords(title)
+@(line + "---")
 
-{for item in list}
-  * {if(item.sex == 'f')}Ms.{else}Mr.{end} {: item.name}
-{end}
+@content.substr(0, 40)...
+
+@for(item in list) {
+  * @if(item.sex == 'f') { Ms. } else { Mr. } @item.name
+}
 ";
   static function main()
   {
@@ -52,6 +53,8 @@
     var template = new erazor.Template(TEMPLATE);
 #if php
     php.Lib.print(template.execute(h));
+#if neko
+    neko.Lib.print(template.execute(h));
 #end
   }
 }
