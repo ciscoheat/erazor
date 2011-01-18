@@ -22,29 +22,13 @@ class Parser
 	
 	private var condMatch : EReg;
 	private var inConditionalMatch : EReg;
-	//private var exitConditionalMatch : EReg;
-	
 	private var variableMatch : EReg;
+	private var variableChar : EReg;
 
 	// State variables for the parser
 	private var context : ParseContext;
 	private var conditionalStack : Int;
 
-	public function new()
-	{
-		condMatch = ~/^@(?:if|for|while)\b/;
-		inConditionalMatch = ~/^(?:\}[\s\r\n]*else if\b|\}[\s\r\n]*else[\s\r\n]*{)/;
-		//exitConditionalMatch = ~/^\}/;
-		
-		variableMatch = ~/^@[A-Za-z]/;
-	}
-	
-	/**
-	 * Parse a script block taking strings and other braces into account.
-	 * @param	scriptPart  Block, not starting with an @
-	 * @param   ?brace      { or (
-	 * @return
-	 */
 	function parseScriptPart(template : String, startBrace = '{', endBrace = ')') : String
 	{
 		var insideSingleQuote = false;
@@ -94,32 +78,22 @@ class Parser
 		throw 'Failed to find a closing delimiter for the script block: ' + template.substr(0, 100);
 	}
 	
-	private function cleanCondition(s : String)
-	{
-		s = StringTools.trim(s);
-		if (s.substr(0, 1) == '(')
-		{
-			s = s.substr(1, s.length - 2);
-			s = StringTools.trim(s);
-		}
-		return s;
-	}
-
 	function parseContext(template : String) : ParseContext
 	{
+		// If a single @ is found, go into code context.
 		if (template.charAt(0) == Parser.at && template.length > 1 && template.charAt(1) != Parser.at) 
 			return ParseContext.code;
 		
+		// Same if we're inside a conditional and a } is found.
 		if (this.conditionalStack > 0 && template.charAt(0) == '}')
 			return ParseContext.code;
 		
+		// Otherwise parse pure text.
 		return ParseContext.literal;
 	}
 	
 	/**
-	 * Main parse method.
-	 * @param	template
-	 * @return
+	 * Main block parse method, called from parse().
 	 */
 	function parseBlock(template : String) : Block
 	{
@@ -135,20 +109,13 @@ class Parser
 	
 	function parseVariable(template : String) : Block
 	{
-		var str = parseString(template, parseVariableChar, false);
-		return { block: TBlock.printBlock(str.substr(1)), length: str.length };		
+		var str = parseString(template.substr(1), parseVariableChar, false);
+		return { block: TBlock.printBlock(str), length: str.length + 1 };
 	}
 
 	function parseVariableChar(char : String) : ParseResult
 	{
-		return switch(char)
-		{
-			case ' ', '	', '{', '}', '<', '>':
-				ParseResult.doneSkipCurrent;
-				
-			default:
-				ParseResult.keepGoing;
-		}
+		return variableChar.match(char) ? ParseResult.keepGoing : ParseResult.doneSkipCurrent;
 	}
 
 	function parseCodeBlock(template : String) : Block
@@ -218,6 +185,11 @@ class Parser
 					case ParseResult.keepGoing:
 						// Just do as he says!
 				}
+				
+				if (char == '"')
+					insideDoubleQuote = true;
+				else if (char == "'")
+					insideSingleQuote = true;
 			}
 			else if(insideDoubleQuote && char == '"' && str.charAt(i-1) != '\\')
 			{
@@ -300,5 +272,15 @@ class Parser
 		}
 		
 		return output;
+	}
+	
+	// Constructor must be put at end of class to prevent intellisense problems with regexps
+	public function new()
+	{
+		// Some are quite simple, could be made with string functions instead for speed
+		condMatch = ~/^@(?:if|for|while)\b/;
+		inConditionalMatch = ~/^(?:\}[\s\r\n]*else if\b|\}[\s\r\n]*else[\s\r\n]*{)/;
+		variableMatch = ~/^@[A-Za-z]/;
+		variableChar = ~/^[\w\[\]"'\.]$/;
 	}
 }
