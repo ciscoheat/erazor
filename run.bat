@@ -1,4 +1,2 @@
 @echo off
-cd bin
-neko htemplate.n
-pause
+neko bin\htemplate.n

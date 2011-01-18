@@ -30,198 +30,142 @@ class TestParser
 		Assert.same([TBlock.literal('<script>if(document.getElementById("test")) { alert("ok"); }</script>')], output);
 	}
 
-	public function test_If_literals_with_braces_are_parsed_correctly()
+	public function test_If_escaped_blocks_are_parsed_correctly()
 	{
-		// Braces but no block
-		var output = parser.parse('{Start and end}');
-		Assert.same([TBlock.literal("{Start and end}")], output);
-		
-		// Braces but no block inside quotes
-		output = parser.parse('"This" is a "{string}"');
-		Assert.same([TBlock.literal('"This" is a "{string}"')], output);
+		var output = parser.parse('normal@@email.com');
+		Assert.same([TBlock.literal("normal@email.com")], output);
+
+		output = parser.parse('AtTheEnd@');
+		Assert.same([TBlock.literal('AtTheEnd@')], output);
+
+		output = parser.parse('more@@than@@one');
+		Assert.same([TBlock.literal('more@than@one')], output);
+
+		output = parser.parse('@@@@{hello}');
+		Assert.same([TBlock.literal('@@{hello}')], output);
 	}
 
 	public function test_If_printblocks_are_parsed_correctly()
 	{
+		var output : Array<TBlock>;
+		
 		// Simple substitution
-		var output = parser.parse('Hello {:name}');
+		output = parser.parse('Hello @name');
 		Assert.same([TBlock.literal("Hello "), TBlock.printBlock("name")], output);
 		
 		// String substitution
-		output = parser.parse('Hello {:"Boris"}');
+		output = parser.parse('Hello@(name)abc');
+		Assert.same([TBlock.literal("Hello"), TBlock.printBlock('name'), TBlock.literal("abc")], output);
+
+		output = parser.parse('Hello @("Boris")');
 		Assert.same([TBlock.literal("Hello "), TBlock.printBlock('"Boris"')], output);
 
 		// String substitution with escaped quotation marks
-		output = parser.parse('Hello {:a + "A \\" string."}');
+		output = parser.parse('Hello @(a + "A \\" string.")');
 		Assert.same([TBlock.literal("Hello "), TBlock.printBlock('a + "A \\" string."')], output);
 
-		output = parser.parse("Hello {:a + 'A \\' string.'}");
+		output = parser.parse("Hello @(a + 'A \\' string.')");
 		Assert.same([TBlock.literal("Hello "), TBlock.printBlock("a + 'A \\' string.'")], output);
 
-		output = parser.parse('{:"\'Mixing\'"}');
+		output = parser.parse('@("\'Mixing\'")');
 		Assert.same([TBlock.printBlock("\"'Mixing'\"")], output);
 		
 		// Braces around var
-		output = parser.parse('Hello {{:name}}');
+		output = parser.parse('Hello {@name}');
 		Assert.same([TBlock.literal("Hello {"), TBlock.printBlock('name'), TBlock.literal('}')], output);
 		
 		// Concatenated vars with space between start/end of block
-		output = parser.parse('{: user.firstname + " " + user.lastname }');
+		output = parser.parse('@( user.firstname + " " + user.lastname )');
 		Assert.same([TBlock.printBlock('user.firstname + " " + user.lastname')], output);
-		
-		output = parser.parse('{ : this.isNotGood }');
-		Assert.same([TBlock.literal("{ : this.isNotGood }")], output);
 	}
-	
 
 	public function test_If_codeblocks_are_parsed_correctly()
 	{
 		// Single codeblock
-		var output = parser.parse('Test: {?a = 0; Lib.print("Evil Bracke}"); }');
+		var output = parser.parse('Test: @{a = 0; Lib.print("Evil Bracke}"); }');
 		Assert.same([
 			TBlock.literal("Test: "),
 			TBlock.codeBlock('a = 0; Lib.print("Evil Bracke}");')
 		], output);
-		
-		// Nested codeblock
-		var output = parser.parse('{? a = 0; if(b == 2) { Lib.print("Ok"); }}');
-		Assert.same([
-			TBlock.codeBlock('a = 0; if(b == 2) { Lib.print("Ok"); }')
-		], output);
-	}
-	
-	
-	public function test_If_evalblocks_are_parsed_correctly()
-	{
-		// Single codeblock
-		var output = parser.parse('Test: {eval}a = 0; Lib.print("Evil Bracke}");{end}');
-		Assert.same([
-			TBlock.literal("Test: "),
-			TBlock.codeBlock('a = 0; Lib.print("Evil Bracke}");')
-		], output);
-		
-		// Nested codeblock
-		var output = parser.parse('{eval} a = 0; if(b == 2) { Lib.print("Ok"); }{end}');
-		Assert.same([
-			TBlock.codeBlock('a = 0; if(b == 2) { Lib.print("Ok"); }')
-		], output);
-	}
 
-	public function test_If_captures_are_parsed_correctly()
-	{
-		var output = parser.parse('{set v}haxe{end} {:uc(v)}');
+		// Nested codeblock
+		var output = parser.parse('@{ a = 0; if(b == 2) { Lib.print("Ok"); }}');
 		Assert.same([
-			TBlock.captureBlock('v'),
-			TBlock.literal('haxe'),
-			TBlock.captureCloseBlock('v'),
-			TBlock.literal(' '),
-			TBlock.printBlock('uc(v)')
+			TBlock.codeBlock('a = 0; if(b == 2) { Lib.print("Ok"); }')
 		], output);
 		
-		output = parser.parse('{set v1}ha{set v2}x{end}e{end}');
+		// @ in codeblock
+		var output = parser.parse('@{ a = 0; if(b == 2) { Lib.print("a@b"); }}');
 		Assert.same([
-			TBlock.captureBlock('v1'),
-			TBlock.literal('ha'),
-			TBlock.captureBlock('v2'),
-			TBlock.literal('x'),
-			TBlock.captureCloseBlock('v2'),
-			TBlock.literal('e'),
-			TBlock.captureCloseBlock('v1'),
+			TBlock.codeBlock('a = 0; if(b == 2) { Lib.print("a@b"); }')
 		], output);
 	}
 
 	public function test_If_keyword_blocks_are_parsed_correctly()
 	{
 		// if
-		var output = parser.parse('Test: {if(a == 0)}Zero{end}');
-		Assert.same([TBlock.literal("Test: "), TBlock.ifBlock("a == 0"), TBlock.literal('Zero'), TBlock.closeBlock], output);
+		var output = parser.parse('Test: @if(a == 0) { Zero }');
+		Assert.same([TBlock.literal("Test: "), TBlock.codeBlock("if(a == 0) {"), TBlock.literal(' Zero '), TBlock.codeBlock("}")], output);
 		
-		// no parenthesis
-		output = parser.parse('Test: {if a == 0}Zero{end}');
-		Assert.same([TBlock.literal("Test: "), TBlock.ifBlock("a == 0"), TBlock.literal('Zero'), TBlock.closeBlock], output);
-
-		// if/else if/else
-		output = parser.parse('{if (a == 0)}Zero{else if (a == 1 && b == 2)}One{else}Above{end}');
+		// nested if
+		var output = parser.parse('@if(a) { @if(b) { Ok }}');
 		Assert.same([
-			TBlock.ifBlock("a == 0"),
-			TBlock.literal('Zero'),
-			TBlock.elseifBlock("a == 1 && b == 2"),
-			TBlock.literal('One'),
-			TBlock.elseBlock,
-			TBlock.literal('Above'),
-			TBlock.closeBlock,
+			TBlock.codeBlock("if(a) {"),
+			TBlock.literal(' '),
+			TBlock.codeBlock("if(b) {"),
+			TBlock.literal(' Ok '),
+			TBlock.codeBlock('}'),
+			TBlock.codeBlock('}')
+		], output);
+		
+		// if/else if/else
+		var output = parser.parse('@if (a == 0) { Zero } else if (a == 1 && b == 2) { One } else { Above }');
+		Assert.same([
+			TBlock.codeBlock("if (a == 0) {"),
+			TBlock.literal(' Zero '),
+			TBlock.codeBlock("} else if (a == 1 && b == 2) {"),
+			TBlock.literal(' One '),
+			TBlock.codeBlock('} else {'),
+			TBlock.literal(' Above '),
+			TBlock.codeBlock('}')
 		], output);
 		
 		// for
-		output = parser.parse('{for (u in users) }{:u.name}<br>{end}');
+		output = parser.parse('@for (u in users) { @u.name<br> }');
 		Assert.same([
-			TBlock.forBlock("u in users"),
+			TBlock.codeBlock("for (u in users) {"),
+			TBlock.literal(' '),
 			TBlock.printBlock('u.name'),
-			TBlock.literal('<br>'),
-			TBlock.closeBlock,
-		], output);
-		
-		// for no parenthesis
-		output = parser.parse('{for u in users}{:u.name}<br>{end}');
-		Assert.same([
-			TBlock.forBlock("u in users"),
-			TBlock.printBlock('u.name'),
-			TBlock.literal('<br>'),
-			TBlock.closeBlock,
+			TBlock.literal('<br> '),
+			TBlock.codeBlock('}')
 		], output);
 		
 		// while
-		output = parser.parse('{while ( a > 0 ) }{? a--; }{end}');
+		output = parser.parse('@while( a > 0 ) { @{a--;} }');
 		Assert.same([
-			TBlock.whileBlock("a > 0"),
+			TBlock.codeBlock("while( a > 0 ) {"),
+			TBlock.literal(' '),
 			TBlock.codeBlock('a--;'),
-			TBlock.closeBlock,
-		], output);
-		
-		// while no parenthesis
-		output = parser.parse('{while a > 0}{? a--; }{end}');
-		Assert.same([
-			TBlock.whileBlock("a > 0"),
-			TBlock.codeBlock('a--;'),
-			TBlock.closeBlock,
-		], output);
-		
-		// Invalid open block (case sensitive)
-		Assert.same([TBlock.literal('{IF(a == 2)}')], parser.parse('{IF(a == 2)}'));
-		
-		// Invalid open block (white space)
-		Assert.same([TBlock.literal('{ if(a == 2)}')], parser.parse('{ if(a == 2)}'));
+			TBlock.literal(' '),
+			TBlock.codeBlock('}')
+		], output);		
 	}
-	
+
 	public function test_If_parsing_exceptions_are_thrown()
 	{
 		var self = this;
 		
 		// Unclosed tags
 		Assert.raises(function() {
-			self.parser.parse('{if (incompleted == true)');
+			self.parser.parse('@if (incompleted == true)');
 		});
 		
 		Assert.raises(function() {
-			self.parser.parse('{:echo{{');
-		});
-		
-		// Unclosed strings
-		Assert.raises(function() {
-			self.parser.parse('{:a + "unclosed string}');
+			self.parser.parse('@{unclosed{{');
 		});
 		
 		Assert.raises(function() {
-			self.parser.parse("{if(a == 'Oops)}");
-		});
-		
-		// Unclosed captures
-		Assert.raises(function() {
-			self.parser.parse('{set v}');
-		});
-		
-		Assert.raises(function() {
-			self.parser.parse('{set v1}{set v2}{end}');
-		});
+			self.parser.parse("@if(a == 'Oops)}");
+		});		
 	}
 }
