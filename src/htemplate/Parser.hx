@@ -280,7 +280,7 @@ class Parser
 		// Some are quite simple, could be made with string functions instead for speed
 		condMatch = ~/^@(?:if|for|while)\b/;
 		inConditionalMatch = ~/^(?:\}[\s\r\n]*else if\b|\}[\s\r\n]*else[\s\r\n]*{)/;
-		variableMatch = ~/^@[A-Za-z]/;
+		variableMatch = ~/^@[_A-Za-z]/;
 		variableChar = ~/^[\w\[\]"'\.]$/;
 	}
 }
