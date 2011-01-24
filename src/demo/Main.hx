@@ -1,4 +1,6 @@
-﻿class Main
+﻿package demo;
+
+class Main
 {
   static var TEMPLATE = "@{
   function ucwords(s) {

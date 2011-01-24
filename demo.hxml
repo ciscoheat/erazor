@@ -1,4 +1,4 @@
 -cp src
 -lib hscript
--main Main
+-main demo.Main
 -x bin/erazor.n
