@@ -22,14 +22,14 @@ class Parser
 	
 	private var condMatch : EReg;
 	private var inConditionalMatch : EReg;
-	private var variableMatch : EReg;
+	//private var variableMatch : EReg;
 	private var variableChar : EReg;
 
 	// State variables for the parser
 	private var context : ParseContext;
 	private var conditionalStack : Int;
 
-	function parseScriptPart(template : String, startBrace = '{', endBrace = ')') : String
+	function parseScriptPart(template : String, startBrace : String, endBrace : String) : String
 	{
 		var insideSingleQuote = false;
 		var insideDoubleQuote = false;
@@ -81,15 +81,46 @@ class Parser
 	function parseContext(template : String) : ParseContext
 	{
 		// If a single @ is found, go into code context.
-		if (template.charAt(0) == Parser.at && template.length > 1 && template.charAt(1) != Parser.at) 
+		if (peek(template) == Parser.at && peek(template, 1) != Parser.at)
 			return ParseContext.code;
 		
 		// Same if we're inside a conditional and a } is found.
-		if (this.conditionalStack > 0 && template.charAt(0) == '}')
+		if (this.conditionalStack > 0 && peek(template) == '}')
 			return ParseContext.code;
 		
 		// Otherwise parse pure text.
 		return ParseContext.literal;
+	}
+	
+	function accept(template : String, acceptor : String -> Bool, throwAtEnd : Bool)
+	{
+		return parseString(template, function(char : String) {
+			return acceptor(char) ? ParseResult.keepGoing : ParseResult.doneSkipCurrent;
+		}, throwAtEnd);
+	}
+	
+	function isIdentifier(char : String, first = true)
+	{
+		return first
+			? (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || char == '_'
+			: (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') || char == '_';
+	}
+	
+	function acceptIdentifier(template : String)
+	{
+		var first = true;
+		var self = this;
+		
+		return accept(template, function(char : String) {
+			var status = self.isIdentifier(char, first);
+			first = false;
+			return status;
+		}, false);
+	}
+	
+	function acceptBracket(template : String, bracket : String)
+	{
+		return parseScriptPart(template, bracket, bracket == '(' ? ')' : ']');
 	}
 	
 	/**
@@ -107,23 +138,53 @@ class Parser
 		return { block: TBlock.codeBlock(str.substr(1)), length: str.length };
 	}
 	
-	function parseVariable(template : String, brace : String) : Block
+	function peek(template : String, offset = 0)
 	{
-		var toParse = template.substr(1);
-		var str : String;
+		return template.length > offset ? template.charAt(offset) : null;
+	}
+	
+	function parseVariable(template : String) : Block
+	{
+		var output = "";
+		var char : String = null;
+		var part : String = null;
+
+		// Remove @
+		template = template.substr(1);
 		
-		if (brace != null)
+		do
 		{
-			// Supported braces are () and []
-			var endBrace = (brace == '(') ? ')' : ']';
-			str = parseScriptPart(toParse, brace, endBrace);
-		}
-		else
-		{
-			str = parseString(toParse, parseVariableChar, false);
-		}
+			// Parse identifier
+			part = acceptIdentifier(template);
+			template = template.substr(part.length);
+			
+			output += part;
+			char = peek(template);
+			
+			// Look for brackets
+			while (char == '(' || char == '[')
+			{
+				part = acceptBracket(template, char);
+				template = template.substr(part.length);
+				
+				output += part;
+				char = peek(template);
+			}
+			
+			// Look for . and if the char after that is an identifier
+			if (char == '.' && isIdentifier(peek(template, 1)))
+			{
+				template = template.substr(1);
+				
+				output += '.';
+			}
+			else
+			{
+				break;
+			}
+		} while (char != null);
 		
-		return { block: TBlock.printBlock(str), length: str.length + 1 };
+		return { block: TBlock.printBlock(output), length: output.length + 1 };
 	}
 
 	function parseVariableChar(char : String) : ParseResult
@@ -134,9 +195,9 @@ class Parser
 	function parseCodeBlock(template : String) : Block
 	{
 		// Test if at end of a conditional
-		if (conditionalStack > 0 && template.charAt(0) == '}')
+		if (conditionalStack > 0 && peek(template) == '}')
 		{
-			// It may not be an end, just a continuation
+			// It may not be an end, just a continuation (else if, else)
 			if (inConditionalMatch.match(template))
 			{
 				var str = parseScriptPart(template, '', '{');
@@ -159,11 +220,11 @@ class Parser
 		}
 		
 		// Test for variable like @name
-		if (variableMatch.match(template))
-			return parseVariable(template, variableMatch.matched(1));
+		if (peek(template) == '@' && isIdentifier(peek(template, 1)))
+			return parseVariable(template);
 			
 		// Test for code or print block @{ or @(
-		var startBrace = template.charAt(1);		
+		var startBrace = peek(template, 1);
 		var endBrace = (startBrace == '{') ? '}' : ')';
 		
 		var str = parseScriptPart(template.substr(1), startBrace, endBrace);
@@ -293,7 +354,7 @@ class Parser
 		// Some are quite simple, could be made with string functions instead for speed
 		condMatch = ~/^@(?:if|for|while)\b/;
 		inConditionalMatch = ~/^(?:\}[\s\r\n]*else if\b|\}[\s\r\n]*else[\s\r\n]*{)/;
-		variableMatch = ~/^@[_A-Za-z][\w\.]*([\(\[])?/;
+		//variableMatch = ~/^@[_A-Za-z][\w\.]*([\(\[])?/;
 		variableChar = ~/^[_\w\.]$/;
 	}
 }

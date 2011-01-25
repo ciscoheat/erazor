@@ -116,6 +116,9 @@ class TestParser
 		
 		output = parser.parse('@test.user.id');
 		Assert.same([TBlock.printBlock('test.user.id')], output);
+		
+		output = parser.parse('@getFunction()()');
+		Assert.same([TBlock.printBlock('getFunction()()')], output);
 	}
 
 	public function test_If_keyword_blocks_are_parsed_correctly()
