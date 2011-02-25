@@ -138,7 +138,7 @@ class TestParser
 			TBlock.codeBlock('}')
 		], output);
 		
-		// if/else if/else
+		// if/else if/else spaced out
 		var output = parser.parse('@if (a == 0) { Zero } else if (a == 1 && b == 2) { One } else { Above }');
 		Assert.same([
 			TBlock.codeBlock("if (a == 0) {"),
@@ -149,7 +149,31 @@ class TestParser
 			TBlock.literal(' Above '),
 			TBlock.codeBlock('}')
 		], output);
+
+		// if/else if/else with some space between braces
+		output = parser.parse('@if (a == 0) { Zero }else if(a == 1 && b == 2) {One} else{ Above }');
+		Assert.same([
+			TBlock.codeBlock("if (a == 0) {"),
+			TBlock.literal(' Zero '),
+			TBlock.codeBlock("}else if(a == 1 && b == 2) {"),
+			TBlock.literal('One'),
+			TBlock.codeBlock('} else{'),
+			TBlock.literal(' Above '),
+			TBlock.codeBlock('}')
+		], output);		
 		
+		// if/else if/else with no space between braces
+		output = parser.parse('@if(a == 0){Zero}else if(a == 1 && b == 2){One}else{Above}');
+		Assert.same([
+			TBlock.codeBlock("if(a == 0){"),
+			TBlock.literal('Zero'),
+			TBlock.codeBlock("}else if(a == 1 && b == 2){"),
+			TBlock.literal('One'),
+			TBlock.codeBlock('}else{'),
+			TBlock.literal('Above'),
+			TBlock.codeBlock('}')
+		], output);
+
 		// for
 		output = parser.parse('@for (u in users) { @u.name<br> }');
 		Assert.same([
