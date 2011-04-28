@@ -309,8 +309,10 @@ class Parser
 					length: nextAt 
 				};
 			}
-			
-			nextAt = template.indexOf(Parser.at, nextAt + 2);
+			if (nextAt + 2 >= template.length)
+				nextAt = -1;
+			else
+				nextAt = template.indexOf(Parser.at, nextAt + 2);
 		}
 		
 		return { 

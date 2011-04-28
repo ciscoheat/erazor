@@ -64,14 +64,14 @@ class EnhancedInterp extends Interp
 #if php
 	override public function expr( e : Expr ) : Dynamic {
 		switch( e ) {
-		case EFunction(params,fexpr,name):
+		case EFunction(params,fexpr,name,ret):
 			var capturedLocals = duplicate(locals);
 			var me = this;
 			var f = function(args:Array<Dynamic>) {
 				var old = me.locals;
 				me.locals = me.duplicate(capturedLocals);
 				for( i in 0...params.length )
-					me.locals.set(params[i],{ r : args[i] });
+					me.locals.set(params[i].name,{ r : args[i] });
 				var r = null;
 				try {
 					r = me.exprReturn(fexpr);

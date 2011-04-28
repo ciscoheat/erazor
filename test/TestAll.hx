@@ -1,4 +1,5 @@
-﻿class TestAll
+﻿import utest.ui.Report;
+class TestAll
 {
 	static function main()
 	{
@@ -9,7 +10,7 @@
 		runner.addCase(new erazor.TestTemplate());
 		//runner.addCase(new erazor.TestEnhancedInterp());
 		
-		var report = new utest.ui.text.PrintReport(runner);
+		var report = Report.create(runner);
 		runner.run();
 	}
 }
