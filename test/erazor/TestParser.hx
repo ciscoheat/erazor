@@ -184,6 +184,16 @@ class TestParser
 			TBlock.codeBlock('}')
 		], output);
 		
+		// for IntIterator
+		output = parser.parse('@for (i in 0...3) { @i<br> }');
+		Assert.same([
+			TBlock.codeBlock("for (i in 0...3) {"),
+			TBlock.literal(' '),
+			TBlock.printBlock('i'),
+			TBlock.literal('<br> '),
+			TBlock.codeBlock('}')
+		], output);
+		
 		// while
 		output = parser.parse('@while( a > 0 ) { @{a--;} }');
 		Assert.same([
