@@ -94,8 +94,8 @@ class Parser
 	
 	function accept(template : String, acceptor : String -> Bool, throwAtEnd : Bool)
 	{
-		return parseString(template, function(char : String) {
-			return acceptor(char) ? ParseResult.keepGoing : ParseResult.doneSkipCurrent;
+		return parseString(template, function(chr : String) {
+			return acceptor(chr) ? ParseResult.keepGoing : ParseResult.doneSkipCurrent;
 		}, throwAtEnd);
 	}
 	
@@ -111,8 +111,8 @@ class Parser
 		var first = true;
 		var self = this;
 		
-		return accept(template, function(char : String) {
-			var status = self.isIdentifier(char, first);
+		return accept(template, function(chr : String) {
+			var status = self.isIdentifier(chr, first);
 			first = false;
 			return status;
 		}, false);
