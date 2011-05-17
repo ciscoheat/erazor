@@ -3,6 +3,6 @@
 	<tag v="cross"/>
 	<tag v="template" />
     <depends name="hscript" version="1.6"/>
-    <description>A haXe implementation of the MVC 3 Razor view engine</description>
-    <version name="0.1.0">First Release</version>
+    <description>A haXe implementation of the MVC 3 Razor template engine</description>
+    <version name="0.1.1">Fixes for hxcpp by andyli</version>
 </project>
