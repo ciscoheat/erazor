@@ -6,7 +6,7 @@ class TestTemplate
 {
 	var template : Template;
 
-	public function new();
+	public function new(){}
 	
 	public function test_If_basic_vars_are_parsed_correctly()
 	{

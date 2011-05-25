@@ -27,7 +27,7 @@ class Parser
 
 	// State variables for the parser
 	private var context : ParseContext;
-	private var conditionalStack : Int;
+	private var bracketStack : Array<ParseContext>;
 
 	function parseScriptPart(template : String, startBrace : String, endBrace : String) : String
 	{
@@ -85,7 +85,7 @@ class Parser
 			return ParseContext.code;
 		
 		// Same if we're inside a conditional and a } is found.
-		if (this.conditionalStack > 0 && peek(template) == '}')
+		if (this.bracketStack.length > 0 && peek(template) == '}')
 			return ParseContext.code;
 		
 		// Otherwise parse pure text.
@@ -195,7 +195,7 @@ class Parser
 	function parseCodeBlock(template : String) : Block
 	{
 		// Test if at end of a conditional
-		if (conditionalStack > 0 && peek(template) == '}')
+		if (bracketStack.length > 0 && peek(template) == '}')
 		{
 			// It may not be an end, just a continuation (else if, else)
 			if (inConditionalMatch.match(template))
@@ -204,8 +204,12 @@ class Parser
 				return { block: TBlock.codeBlock(str), length: str.length };
 			}
 			
-			//trace("--conditionalStack");
-			--conditionalStack;
+			//trace("--bracketStack");
+			
+			switch (bracketStack.pop()) {
+				case code: //correct
+				default: throw "Bracket mismatch!";
+			}
 			
 			return { block: TBlock.codeBlock('}'), length: 1 };
 		}
@@ -213,8 +217,8 @@ class Parser
 		// Test for conditional code block
 		if (condMatch.match(template))
 		{
-			//trace("++conditionalStack");
-			++conditionalStack;
+			//trace("++bracketStack");
+			bracketStack.push(code);
 			
 			return parseConditional(template);
 		}
@@ -283,41 +287,34 @@ class Parser
 
 	function parseLiteral(template : String) : Block
 	{
-		var nextAt = template.indexOf(Parser.at);
-		var nextBracket = this.conditionalStack > 0 ? template.indexOf('}') : -1;
+		var len = template.length;
+		var i = -1;
 		
-		//trace("nextAt: " + nextAt + ", nextBracket: " + nextBracket);
-
-		while (nextAt >= 0 || nextBracket >= 0)
-		{
-			// If we hit a bracket before the @, return the block from there.
-			if (nextBracket >= 0 && (nextAt == -1 || nextBracket < nextAt))
-			{
-				return { 
-					block: TBlock.literal(escapeLiteral(template.substr(0, nextBracket))),
-					length: nextBracket 
-				};
+		while (++i < len) {
+			var char = template.charAt(i);
+			switch(char) {
+				case Parser.at:
+					// Test for escaped @
+					if (len > i + 1 && template.charAt(i + 1) != Parser.at) {
+						return { 
+							block: TBlock.literal(escapeLiteral(template.substr(0, i))), 
+							length: i 
+						};
+					}
+					++i;
+				case '}':
+					// If we hit a bracket before the @, return the block from there.
+					if (bracketStack.length > 0)
+						return { 
+							block: TBlock.literal(escapeLiteral(template.substr(0, i))),
+							length: i 
+						};
 			}
-
-			var len = template.length;
-
-			// Test for escaped @
-			if (len > nextAt + 1 && template.charAt(nextAt + 1) != Parser.at)
-			{
-				return { 
-					block: TBlock.literal(escapeLiteral(template.substr(0, nextAt))), 
-					length: nextAt 
-				};
-			}
-			if (nextAt + 2 >= template.length)
-				nextAt = -1;
-			else
-				nextAt = template.indexOf(Parser.at, nextAt + 2);
 		}
 		
 		return { 
 			block: TBlock.literal(escapeLiteral(template)), 
-			length: template.length 
+			length: len
 		};
 	}
 	
@@ -334,7 +331,7 @@ class Parser
 	public function parse(template : String) : Array<TBlock>
 	{
 		var output = new Array<TBlock>();		
-		conditionalStack = 0;
+		bracketStack = [];
 		
 		while (template != '')
 		{
