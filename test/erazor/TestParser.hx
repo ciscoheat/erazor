@@ -220,6 +220,35 @@ class TestParser
 		
 		Assert.raises(function() {
 			self.parser.parse("@if(a == 'Oops)}");
-		});		
+		});
+		
+		//non-paired brackets
+		
+		Assert.raises(function() {
+			self.parser.parse("@if(true){{}");
+		});
+		
+		Assert.raises(function() {
+			self.parser.parse("@if(true){}}");
+		});
+	}
+	
+	public function test_If_paired_brackets_are_parsed_correctly()
+	{
+		var output;
+		
+		output = parser.parse('@if(true){ {} }');
+		Assert.same([
+			TBlock.codeBlock("if(true){"),
+			TBlock.literal(' {} '),
+			TBlock.codeBlock('}')
+		], output);	
+		
+		output = parser.parse('@for(i in 0...3){ {{}{{}}} }');
+		Assert.same([
+			TBlock.codeBlock("for(i in 0...3){"),
+			TBlock.literal(' {{}{{}}} '),
+			TBlock.codeBlock('}')
+		], output);		
 	}
 }

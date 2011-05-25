@@ -28,6 +28,9 @@ class Parser
 	// State variables for the parser
 	private var context : ParseContext;
 	private var bracketStack : Array<ParseContext>;
+	private var conditionalStack : Int;
+	
+	private static var bracketMismatch = "Bracket mismatch! Inside template, non-paired brackets, '{' or '}', should be replaced by @{'{'} and @{'}'}.";
 
 	function parseScriptPart(template : String, startBrace : String, endBrace : String) : String
 	{
@@ -85,8 +88,11 @@ class Parser
 			return ParseContext.code;
 		
 		// Same if we're inside a conditional and a } is found.
-		if (this.bracketStack.length > 0 && peek(template) == '}')
-			return ParseContext.code;
+		if (conditionalStack > 0 && peek(template) == '}')
+			switch(bracketStack[bracketStack.length - 1]) {
+				case code: return ParseContext.code;
+				default:
+			}
 		
 		// Otherwise parse pure text.
 		return ParseContext.literal;
@@ -204,12 +210,10 @@ class Parser
 				return { block: TBlock.codeBlock(str), length: str.length };
 			}
 			
-			//trace("--bracketStack");
-			
-			switch (bracketStack.pop()) {
-				case code: //correct
-				default: throw "Bracket mismatch!";
-			}
+			if (switch (bracketStack.pop()) {
+				case code: --conditionalStack < 0;
+				default: true;
+			}) throw bracketMismatch;
 			
 			return { block: TBlock.codeBlock('}'), length: 1 };
 		}
@@ -217,8 +221,8 @@ class Parser
 		// Test for conditional code block
 		if (condMatch.match(template))
 		{
-			//trace("++bracketStack");
 			bracketStack.push(code);
+			++conditionalStack;
 			
 			return parseConditional(template);
 		}
@@ -303,12 +307,21 @@ class Parser
 					}
 					++i;
 				case '}':
-					// If we hit a bracket before the @, return the block from there.
-					if (bracketStack.length > 0)
-						return { 
-							block: TBlock.literal(escapeLiteral(template.substr(0, i))),
-							length: i 
-						};
+					if (bracketStack.length > 0) {
+						switch (bracketStack[bracketStack.length - 1]) {
+							case code:
+								return { 
+									block: TBlock.literal(escapeLiteral(template.substr(0, i))),
+									length: i 
+								};
+							case literal:
+								bracketStack.pop();
+						}
+					} else {
+						 throw bracketMismatch;
+					}
+				case '{':
+					bracketStack.push(literal);
 			}
 		}
 		
@@ -332,6 +345,7 @@ class Parser
 	{
 		var output = new Array<TBlock>();		
 		bracketStack = [];
+		conditionalStack = 0;
 		
 		while (template != '')
 		{
@@ -343,6 +357,8 @@ class Parser
 				
 			template = template.substr(block.length);
 		}
+		
+		if (bracketStack.length != 0) throw bracketMismatch;
 		
 		return output;
 	}
