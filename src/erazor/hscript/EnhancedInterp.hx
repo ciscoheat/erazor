@@ -10,6 +10,23 @@ class EnhancedInterp extends Interp
 #elseif php
 	static var re = ~/^[^0-9]+(\d+)/;
 #end
+	override public function new(){
+		#if getter_support
+		ReflectMacro.addMeta();
+		#end
+		super();
+
+	}
+	override function get( o : Dynamic, f : String ) : Dynamic {
+		if( o == null ) throw Error.EInvalidAccess(f);
+		
+		return 
+		#if getter_support
+		 EnhancedReflect.getProperty(o,f);
+		#else
+		 Reflect.field( o , f );
+		#end
+	}
 	override function call( o : Dynamic, f : Dynamic, args : Array<Dynamic> ) : Dynamic {
 #if php
 		while (true)
