@@ -54,6 +54,10 @@ class Main
     php.Lib.print(template.execute(h));
 #elseif neko
     neko.Lib.print(template.execute(h));
+#elseif cpp
+    cpp.Lib.print(template.execute(h));
+#else
+	trace(template.execute(h));
 #end
   }
 }

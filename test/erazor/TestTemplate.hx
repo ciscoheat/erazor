@@ -6,7 +6,7 @@ class TestTemplate
 {
 	var template : Template;
 
-	public function new();
+	public function new(){}
 	
 	public function test_If_basic_vars_are_parsed_correctly()
 	{
@@ -42,7 +42,7 @@ class TestTemplate
 		template = new Template("@{ a = 10; }@while(--a > 0){@a}");
 		Assert.equals("987654321", template.execute());
 		
-		template = new Template("@{var a = 10; var b = ''; while(--a > 0){b += a;} }@b");
+		template = new Template("@{var a = 9; var b = '9'; while(--a > 0){b += a;} }@b");
 		Assert.equals("987654321", template.execute());
 	}
 

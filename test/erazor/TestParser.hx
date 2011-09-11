@@ -12,7 +12,7 @@ class TestParser
 {
 	var parser : Parser;
 
-	public function new();
+	public function new(){}
 	
 	public function setup()
 	{
@@ -184,6 +184,16 @@ class TestParser
 			TBlock.codeBlock('}')
 		], output);
 		
+		// for IntIterator
+		output = parser.parse('@for (i in 0...3) { @i<br> }');
+		Assert.same([
+			TBlock.codeBlock("for (i in 0...3) {"),
+			TBlock.literal(' '),
+			TBlock.printBlock('i'),
+			TBlock.literal('<br> '),
+			TBlock.codeBlock('}')
+		], output);
+		
 		// while
 		output = parser.parse('@while( a > 0 ) { @{a--;} }');
 		Assert.same([
@@ -210,6 +220,35 @@ class TestParser
 		
 		Assert.raises(function() {
 			self.parser.parse("@if(a == 'Oops)}");
-		});		
+		});
+		
+		//non-paired brackets
+		
+		Assert.raises(function() {
+			self.parser.parse("@if(true){{}");
+		});
+		
+		Assert.raises(function() {
+			self.parser.parse("@if(true){}}");
+		});
+	}
+	
+	public function test_If_paired_brackets_are_parsed_correctly()
+	{
+		var output;
+		
+		output = parser.parse('@if(true){ {} }');
+		Assert.same([
+			TBlock.codeBlock("if(true){"),
+			TBlock.literal(' {} '),
+			TBlock.codeBlock('}')
+		], output);	
+		
+		output = parser.parse('@for(i in 0...3){ {{}{{}}} }');
+		Assert.same([
+			TBlock.codeBlock("for(i in 0...3){"),
+			TBlock.literal(' {{}{{}}} '),
+			TBlock.codeBlock('}')
+		], output);		
 	}
 }
