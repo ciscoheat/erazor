@@ -185,7 +185,7 @@
 		<serialize public="1" set="method" line="70" static="1">
 			<f a="v">
 				<d/>
-				<c path="String"/>
+				<c path="haxe.io.Bytes"/>
 			</f>
 			<haxe_doc>
 		Serialize using native Neko serialization. This will return a Binary string that can be
@@ -194,7 +194,7 @@
 		</serialize>
 		<unserialize public="1" set="method" line="77" static="1">
 			<f a="s">
-				<c path="String"/>
+				<c path="haxe.io.Bytes"/>
 				<d/>
 			</f>
 			<haxe_doc>
@@ -203,7 +203,7 @@
 		</unserialize>
 		<localUnserialize public="1" set="method" line="88" static="1">
 			<f a="s">
-				<c path="String"/>
+				<c path="haxe.io.Bytes"/>
 				<d/>
 			</f>
 			<haxe_doc>
@@ -258,10 +258,10 @@
 		</bytesReference>
 		<__serialize line="183" static="1"><f a="">
 	<d/>
-	<c path="String"/>
+	<t path="haxe.io.BytesData"/>
 </f></__serialize>
 		<__unserialize line="184" static="1"><f a=":">
-	<unknown/>
+	<t path="haxe.io.BytesData"/>
 	<a>
 		<loadprim><f a="p:n">
 	<unknown/>
@@ -670,6 +670,175 @@
 </f></trace>
 		<clear public="1" set="dynamic" line="43" static="1"><f a=""><e path="Void"/></f></clear>
 	</class>
+	<typedef path="haxe.macro.Ref" params="T" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"><a>
+	<toString set="method"><f a=""><c path="String"/></f></toString>
+	<get set="method"><f a=""><c path="haxe.macro.Ref.T"/></f></get>
+</a></typedef>
+	<enum path="haxe.macro.Type" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx">
+		<TType a="t:params">
+			<t path="haxe.macro.Ref"><t path="haxe.macro.DefType"/></t>
+			<c path="Array"><e path="haxe.macro.Type"/></c>
+		</TType>
+		<TMono a="t"><t path="haxe.macro.Ref"><t path="Null"><e path="haxe.macro.Type"/></t></t></TMono>
+		<TLazy a="f"><f a=""><e path="haxe.macro.Type"/></f></TLazy>
+		<TInst a="t:params">
+			<t path="haxe.macro.Ref"><t path="haxe.macro.ClassType"/></t>
+			<c path="Array"><e path="haxe.macro.Type"/></c>
+		</TInst>
+		<TFun a="args:ret">
+			<c path="Array"><a>
+	<t><e path="haxe.macro.Type"/></t>
+	<opt><e path="Bool"/></opt>
+	<name><c path="String"/></name>
+</a></c>
+			<e path="haxe.macro.Type"/>
+		</TFun>
+		<TEnum a="t:params">
+			<t path="haxe.macro.Ref"><t path="haxe.macro.EnumType"/></t>
+			<c path="Array"><e path="haxe.macro.Type"/></c>
+		</TEnum>
+		<TDynamic a="t"><t path="Null"><e path="haxe.macro.Type"/></t></TDynamic>
+		<TAnonymous a="a"><t path="haxe.macro.Ref"><t path="haxe.macro.AnonType"/></t></TAnonymous>
+	</enum>
+	<typedef path="haxe.macro.AnonType" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"><a><fields><c path="Array"><t path="haxe.macro.ClassField"/></c></fields></a></typedef>
+	<typedef path="haxe.macro.BaseType" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"><a>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<params><c path="Array"><a>
+	<t><e path="haxe.macro.Type"/></t>
+	<name><c path="String"/></name>
+</a></c></params>
+	<pack><c path="Array"><c path="String"/></c></pack>
+	<name><c path="String"/></name>
+	<module><c path="String"/></module>
+	<meta><t path="haxe.macro.MetaAccess"/></meta>
+	<isPrivate><e path="Bool"/></isPrivate>
+	<isExtern><e path="Bool"/></isExtern>
+	<exclude set="method"><f a=""><e path="Void"/></f></exclude>
+	<doc><t path="Null"><c path="String"/></t></doc>
+</a></typedef>
+	<typedef path="haxe.macro.ClassField" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"><a>
+	<type><e path="haxe.macro.Type"/></type>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<params><c path="Array"><a>
+	<t><e path="haxe.macro.Type"/></t>
+	<name><c path="String"/></name>
+</a></c></params>
+	<name><c path="String"/></name>
+	<meta><t path="haxe.macro.MetaAccess"/></meta>
+	<kind><e path="haxe.macro.FieldKind"/></kind>
+	<isPublic><e path="Bool"/></isPublic>
+	<expr><t path="Null"><e path="haxe.macro.TypedExpr"/></t></expr>
+	<doc><t path="Null"><c path="String"/></t></doc>
+</a></typedef>
+	<typedef path="haxe.macro.ClassType" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"><a>
+	<superClass><t path="Null"><a>
+	<t><t path="haxe.macro.Ref"><t path="haxe.macro.ClassType"/></t></t>
+	<params><c path="Array"><e path="haxe.macro.Type"/></c></params>
+</a></t></superClass>
+	<statics><t path="haxe.macro.Ref"><c path="Array"><t path="haxe.macro.ClassField"/></c></t></statics>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<params><c path="Array"><a>
+	<t><e path="haxe.macro.Type"/></t>
+	<name><c path="String"/></name>
+</a></c></params>
+	<pack><c path="Array"><c path="String"/></c></pack>
+	<name><c path="String"/></name>
+	<module><c path="String"/></module>
+	<meta><t path="haxe.macro.MetaAccess"/></meta>
+	<isPrivate><e path="Bool"/></isPrivate>
+	<isInterface><e path="Bool"/></isInterface>
+	<isExtern><e path="Bool"/></isExtern>
+	<interfaces><c path="Array"><a>
+	<t><t path="haxe.macro.Ref"><t path="haxe.macro.ClassType"/></t></t>
+	<params><c path="Array"><e path="haxe.macro.Type"/></c></params>
+</a></c></interfaces>
+	<init><t path="Null"><e path="haxe.macro.TypedExpr"/></t></init>
+	<fields><t path="haxe.macro.Ref"><c path="Array"><t path="haxe.macro.ClassField"/></c></t></fields>
+	<exclude set="method"><f a=""><e path="Void"/></f></exclude>
+	<doc><t path="Null"><c path="String"/></t></doc>
+	<constructor><t path="Null"><t path="haxe.macro.Ref"><t path="haxe.macro.ClassField"/></t></t></constructor>
+</a></typedef>
+	<typedef path="haxe.macro.EnumField" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"><a>
+	<type><e path="haxe.macro.Type"/></type>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<name><c path="String"/></name>
+	<meta><t path="haxe.macro.MetaAccess"/></meta>
+	<index><c path="Int"/></index>
+	<doc><t path="Null"><c path="String"/></t></doc>
+</a></typedef>
+	<typedef path="haxe.macro.EnumType" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"><a>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<params><c path="Array"><a>
+	<t><e path="haxe.macro.Type"/></t>
+	<name><c path="String"/></name>
+</a></c></params>
+	<pack><c path="Array"><c path="String"/></c></pack>
+	<names><c path="Array"><c path="String"/></c></names>
+	<name><c path="String"/></name>
+	<module><c path="String"/></module>
+	<meta><t path="haxe.macro.MetaAccess"/></meta>
+	<isPrivate><e path="Bool"/></isPrivate>
+	<isExtern><e path="Bool"/></isExtern>
+	<exclude set="method"><f a=""><e path="Void"/></f></exclude>
+	<doc><t path="Null"><c path="String"/></t></doc>
+	<constructs><c path="Hash"><t path="haxe.macro.EnumField"/></c></constructs>
+</a></typedef>
+	<typedef path="haxe.macro.DefType" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"><a>
+	<type><e path="haxe.macro.Type"/></type>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<params><c path="Array"><a>
+	<t><e path="haxe.macro.Type"/></t>
+	<name><c path="String"/></name>
+</a></c></params>
+	<pack><c path="Array"><c path="String"/></c></pack>
+	<name><c path="String"/></name>
+	<module><c path="String"/></module>
+	<meta><t path="haxe.macro.MetaAccess"/></meta>
+	<isPrivate><e path="Bool"/></isPrivate>
+	<isExtern><e path="Bool"/></isExtern>
+	<exclude set="method"><f a=""><e path="Void"/></f></exclude>
+	<doc><t path="Null"><c path="String"/></t></doc>
+</a></typedef>
+	<typedef path="haxe.macro.MetaAccess" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"><a>
+	<remove set="method"><f a="name">
+	<c path="String"/>
+	<e path="Void"/>
+</f></remove>
+	<has set="method"><f a="name">
+	<c path="String"/>
+	<e path="Bool"/>
+</f></has>
+	<get set="method"><f a=""><t path="haxe.macro.Metadata"/></f></get>
+	<add set="method"><f a="name:params:pos">
+	<c path="String"/>
+	<c path="Array"><t path="haxe.macro.Expr"/></c>
+	<t path="haxe.macro.Position"/>
+	<e path="Void"/>
+</f></add>
+</a></typedef>
+	<enum path="haxe.macro.FieldKind" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type">
+		<FVar a="read:write">
+			<e path="haxe.macro.VarAccess"/>
+			<e path="haxe.macro.VarAccess"/>
+		</FVar>
+		<FMethod a="k"><e path="haxe.macro.MethodKind"/></FMethod>
+	</enum>
+	<enum path="haxe.macro.VarAccess" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type">
+		<AccResolve/>
+		<AccRequire a="r"><c path="String"/></AccRequire>
+		<AccNormal/>
+		<AccNo/>
+		<AccNever/>
+		<AccInline/>
+		<AccCall a="m"><c path="String"/></AccCall>
+	</enum>
+	<enum path="haxe.macro.MethodKind" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type">
+		<MethNormal/>
+		<MethMacro/>
+		<MethInline/>
+		<MethDynamic/>
+	</enum>
+	<enum path="haxe.macro.TypedExpr" params="" file="C:\Projects\haxe/std/haxe/macro/Type.hx" module="haxe.macro.Type"/>
 	<class path="erazor.ScriptBuilder" params="" file="src/erazor/ScriptBuilder.hx">
 		<context><c path="String"/></context>
 		<build public="1" set="method" line="12"><f a="blocks">
@@ -685,6 +854,207 @@
 	<e path="Void"/>
 </f></new>
 	</class>
+	<class path="haxe.macro.Context" params="" file="C:\Projects\haxe/std/haxe/macro/Context.hx">
+		<error public="1" set="method" line="37" static="1">
+			<f a="msg:pos">
+				<c path="String"/>
+				<t path="haxe.macro.Position"/>
+				<d/>
+			</f>
+			<haxe_doc>
+		Display a compilation error at the given position in code and abort the current macro call
+	</haxe_doc>
+		</error>
+		<warning public="1" set="method" line="44" static="1">
+			<f a="msg:pos">
+				<c path="String"/>
+				<t path="haxe.macro.Position"/>
+				<e path="Void"/>
+			</f>
+			<haxe_doc>
+		Display a compilation warning at the given position in code
+	</haxe_doc>
+		</warning>
+		<resolvePath public="1" set="method" line="51" static="1">
+			<f a="file">
+				<c path="String"/>
+				<c path="String"/>
+			</f>
+			<haxe_doc>
+		Resolve a filename based on current classpath.
+	</haxe_doc>
+		</resolvePath>
+		<getClassPath public="1" set="method" line="58" static="1">
+			<f a=""><c path="Array"><c path="String"/></c></f>
+			<haxe_doc>
+		Return the current classpath
+	</haxe_doc>
+		</getClassPath>
+		<currentPos public="1" set="method" line="69" static="1">
+			<f a=""><t path="haxe.macro.Position"/></f>
+			<haxe_doc>
+		Returns the position at which the macro is called
+	</haxe_doc>
+		</currentPos>
+		<getLocalClass public="1" set="method" line="76" static="1">
+			<f a=""><t path="Null"><t path="haxe.macro.Ref"><t path="haxe.macro.ClassType"/></t></t></f>
+			<haxe_doc>
+		Returns the current class in which the macro is called
+	</haxe_doc>
+		</getLocalClass>
+		<getLocalType public="1" set="method" line="88" static="1">
+			<f a=""><t path="Null"><e path="haxe.macro.Type"/></t></f>
+			<haxe_doc>
+		Returns the current type in/on which the macro is called
+	</haxe_doc>
+		</getLocalType>
+		<defined public="1" set="method" line="97" static="1">
+			<f a="s">
+				<c path="String"/>
+				<e path="Bool"/>
+			</f>
+			<haxe_doc>
+		Tells is the given compiler directive has been defined with -D
+	</haxe_doc>
+		</defined>
+		<getType public="1" set="method" line="104" static="1">
+			<f a="name">
+				<c path="String"/>
+				<e path="haxe.macro.Type"/>
+			</f>
+			<haxe_doc>
+		Resolve a type from its name.
+	</haxe_doc>
+		</getType>
+		<getModule public="1" set="method" line="111" static="1">
+			<f a="name">
+				<c path="String"/>
+				<c path="Array"><e path="haxe.macro.Type"/></c>
+			</f>
+			<haxe_doc>
+		Return the list of types defined in the given compilation unit module
+	</haxe_doc>
+		</getModule>
+		<parse public="1" set="method" line="118" static="1">
+			<f a="expr:pos">
+				<c path="String"/>
+				<t path="haxe.macro.Position"/>
+				<t path="haxe.macro.Expr"/>
+			</f>
+			<haxe_doc>
+		Parse an expression.
+	</haxe_doc>
+		</parse>
+		<makeExpr public="1" set="method" line="125" static="1">
+			<f a="v:pos">
+				<d/>
+				<t path="haxe.macro.Position"/>
+				<t path="haxe.macro.Expr"/>
+			</f>
+			<haxe_doc>
+		Build an expression corresponding to the given runtime value. Only basic types + enums are supported.
+	</haxe_doc>
+		</makeExpr>
+		<signature public="1" set="method" line="132" static="1">
+			<f a="v">
+				<d/>
+				<c path="String"/>
+			</f>
+			<haxe_doc>
+		Quickly build an hashed MD5 signature for any given value
+	</haxe_doc>
+		</signature>
+		<onGenerate public="1" set="method" line="139" static="1">
+			<f a="callb">
+				<f a="">
+					<c path="Array"><e path="haxe.macro.Type"/></c>
+					<e path="Void"/>
+				</f>
+				<e path="Void"/>
+			</f>
+			<haxe_doc>
+		Set a callback function that will return all the types compiled before they get generated.
+	</haxe_doc>
+		</onGenerate>
+		<typeof public="1" set="method" line="146" static="1">
+			<f a="e">
+				<t path="haxe.macro.Expr"/>
+				<e path="haxe.macro.Type"/>
+			</f>
+			<haxe_doc>
+		Evaluate the type a given expression would have in the context of the current macro call.
+	</haxe_doc>
+		</typeof>
+		<follow public="1" set="method" line="153" static="1">
+			<f a="t:?once">
+				<e path="haxe.macro.Type"/>
+				<e path="Bool"/>
+				<e path="haxe.macro.Type"/>
+			</f>
+			<haxe_doc>
+		Follow all typedefs to reach the actual real type
+	</haxe_doc>
+		</follow>
+		<getPosInfos public="1" set="method" line="160" static="1">
+			<f a="p">
+				<t path="haxe.macro.Position"/>
+				<a>
+					<min><c path="Int"/></min>
+					<max><c path="Int"/></max>
+					<file><c path="String"/></file>
+				</a>
+			</f>
+			<haxe_doc>
+		Get the informations stored into a given position.
+	</haxe_doc>
+		</getPosInfos>
+		<makePosition public="1" set="method" line="169" static="1">
+			<f a="inf">
+				<a>
+					<min><c path="Int"/></min>
+					<max><c path="Int"/></max>
+					<file><c path="String"/></file>
+				</a>
+				<t path="haxe.macro.Position"/>
+			</f>
+			<haxe_doc>
+		Build a position with the given informations.
+	</haxe_doc>
+		</makePosition>
+		<addResource public="1" set="method" line="176" static="1">
+			<f a="name:data">
+				<c path="String"/>
+				<c path="haxe.io.Bytes"/>
+				<e path="Void"/>
+			</f>
+			<haxe_doc>
+		Add or modify a resource that will be accessible with haxe.Resource api.
+	</haxe_doc>
+		</addResource>
+		<getBuildFields public="1" set="method" line="183" static="1">
+			<f a=""><c path="Array"><t path="haxe.macro.Field"/></c></f>
+			<haxe_doc>
+		Returns the list of fields for the current type inside the build macro.
+	</haxe_doc>
+		</getBuildFields>
+		<defineType public="1" set="method" line="190" static="1">
+			<f a="t">
+				<t path="haxe.macro.TypeDefinition"/>
+				<e path="Void"/>
+			</f>
+			<haxe_doc>
+		Define a new type based on the given definition.
+	</haxe_doc>
+		</defineType>
+		<load set="method" line="194" static="1"><f a="f:nargs">
+	<c path="String"/>
+	<c path="Int"/>
+	<d/>
+</f></load>
+		<haxe_doc>
+	This is an API that can be used by macros implementations.
+</haxe_doc>
+	</class>
 	<class path="StringBuf" params="" file="C:\Projects\haxe/std/neko/_std/StringBuf.hx">
 		<__make line="50" static="1"><d/></__make>
 		<__add line="51" static="1"><d/></__add>
@@ -693,7 +1063,7 @@
 		<__string line="54" static="1"><d/></__string>
 		<b><d/></b>
 		<add public="1" get="inline" set="null" line="34">
-			<f a="?x">
+			<f a="x">
 				<d/>
 				<e path="Void"/>
 			</f>
@@ -1119,7 +1489,7 @@
 	<c path="neko.NativeArray"><c path="blit.T"/></c>
 	<c path="Int"/>
 	<c path="Int"/>
-	<unknown/>
+	<e path="Void"/>
 </f></blit>
 		<ofArrayCopy public="1" params="T" get="inline" set="null" line="37" static="1"><f a="a">
 	<c path="Array"><c path="ofArrayCopy.T"/></c>
@@ -1143,6 +1513,270 @@
 	<c path="neko.NativeArray"><d/></c>
 	<c path="Int"/>
 </f></length>
+	</class>
+	<typedef path="haxe.macro.Position" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr"><a>
+	<min><c path="Int"/></min>
+	<max><c path="Int"/></max>
+	<file><c path="String"/></file>
+</a></typedef>
+	<enum path="haxe.macro.Constant" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<CType a="s"><c path="String"/></CType>
+		<CString a="s"><c path="String"/></CString>
+		<CRegexp a="r:opt">
+			<c path="String"/>
+			<c path="String"/>
+		</CRegexp>
+		<CInt a="v"><c path="String"/></CInt>
+		<CIdent a="s"><c path="String"/></CIdent>
+		<CFloat a="f"><c path="String"/></CFloat>
+	</enum>
+	<enum path="haxe.macro.Binop" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<OpXor/>
+		<OpUShr/>
+		<OpSub/>
+		<OpShr/>
+		<OpShl/>
+		<OpOr/>
+		<OpNotEq/>
+		<OpMult/>
+		<OpMod/>
+		<OpLte/>
+		<OpLt/>
+		<OpInterval/>
+		<OpGte/>
+		<OpGt/>
+		<OpEq/>
+		<OpDiv/>
+		<OpBoolOr/>
+		<OpBoolAnd/>
+		<OpAssignOp a="op"><e path="haxe.macro.Binop"/></OpAssignOp>
+		<OpAssign/>
+		<OpAnd/>
+		<OpAdd/>
+	</enum>
+	<enum path="haxe.macro.Unop" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<OpNot/>
+		<OpNegBits/>
+		<OpNeg/>
+		<OpIncrement/>
+		<OpDecrement/>
+	</enum>
+	<typedef path="haxe.macro.Expr" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx"><a>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<expr><e path="haxe.macro.ExprDef"/></expr>
+</a></typedef>
+	<typedef path="haxe.macro.ExprRequire" params="T" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr"><t path="haxe.macro.Expr"/></typedef>
+	<enum path="haxe.macro.ExprDef" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<EWhile a="econd:e:normalWhile">
+			<t path="haxe.macro.Expr"/>
+			<t path="haxe.macro.Expr"/>
+			<e path="Bool"/>
+		</EWhile>
+		<EVars a="vars"><c path="Array"><a>
+	<type><t path="Null"><e path="haxe.macro.ComplexType"/></t></type>
+	<name><c path="String"/></name>
+	<expr><t path="Null"><t path="haxe.macro.Expr"/></t></expr>
+</a></c></EVars>
+		<EUntyped a="e"><t path="haxe.macro.Expr"/></EUntyped>
+		<EUnop a="op:postFix:e">
+			<e path="haxe.macro.Unop"/>
+			<e path="Bool"/>
+			<t path="haxe.macro.Expr"/>
+		</EUnop>
+		<EType a="e:field">
+			<t path="haxe.macro.Expr"/>
+			<c path="String"/>
+		</EType>
+		<ETry a="e:catches">
+			<t path="haxe.macro.Expr"/>
+			<c path="Array"><a>
+	<type><e path="haxe.macro.ComplexType"/></type>
+	<name><c path="String"/></name>
+	<expr><t path="haxe.macro.Expr"/></expr>
+</a></c>
+		</ETry>
+		<EThrow a="e"><t path="haxe.macro.Expr"/></EThrow>
+		<ETernary a="econd:eif:eelse">
+			<t path="haxe.macro.Expr"/>
+			<t path="haxe.macro.Expr"/>
+			<t path="haxe.macro.Expr"/>
+		</ETernary>
+		<ESwitch a="e:cases:edef">
+			<t path="haxe.macro.Expr"/>
+			<c path="Array"><a>
+	<values><c path="Array"><t path="haxe.macro.Expr"/></c></values>
+	<expr><t path="haxe.macro.Expr"/></expr>
+</a></c>
+			<t path="Null"><t path="haxe.macro.Expr"/></t>
+		</ESwitch>
+		<EReturn a="?e"><t path="haxe.macro.Expr"/></EReturn>
+		<EParenthesis a="e"><t path="haxe.macro.Expr"/></EParenthesis>
+		<EObjectDecl a="fields"><c path="Array"><a>
+	<field><c path="String"/></field>
+	<expr><t path="haxe.macro.Expr"/></expr>
+</a></c></EObjectDecl>
+		<ENew a="t:params">
+			<t path="haxe.macro.TypePath"/>
+			<c path="Array"><t path="haxe.macro.Expr"/></c>
+		</ENew>
+		<EIn a="e1:e2">
+			<t path="haxe.macro.Expr"/>
+			<t path="haxe.macro.Expr"/>
+		</EIn>
+		<EIf a="econd:eif:eelse">
+			<t path="haxe.macro.Expr"/>
+			<t path="haxe.macro.Expr"/>
+			<t path="Null"><t path="haxe.macro.Expr"/></t>
+		</EIf>
+		<EFunction a="name:f">
+			<t path="Null"><c path="String"/></t>
+			<t path="haxe.macro.Function"/>
+		</EFunction>
+		<EFor a="it:expr">
+			<t path="haxe.macro.Expr"/>
+			<t path="haxe.macro.Expr"/>
+		</EFor>
+		<EField a="e:field">
+			<t path="haxe.macro.Expr"/>
+			<c path="String"/>
+		</EField>
+		<EDisplayNew a="t"><t path="haxe.macro.TypePath"/></EDisplayNew>
+		<EDisplay a="e:isCall">
+			<t path="haxe.macro.Expr"/>
+			<e path="Bool"/>
+		</EDisplay>
+		<EContinue/>
+		<EConst a="c"><e path="haxe.macro.Constant"/></EConst>
+		<ECheckType a="e:t">
+			<t path="haxe.macro.Expr"/>
+			<e path="haxe.macro.ComplexType"/>
+		</ECheckType>
+		<ECast a="e:t">
+			<t path="haxe.macro.Expr"/>
+			<t path="Null"><e path="haxe.macro.ComplexType"/></t>
+		</ECast>
+		<ECall a="e:params">
+			<t path="haxe.macro.Expr"/>
+			<c path="Array"><t path="haxe.macro.Expr"/></c>
+		</ECall>
+		<EBreak/>
+		<EBlock a="exprs"><c path="Array"><t path="haxe.macro.Expr"/></c></EBlock>
+		<EBinop a="op:e1:e2">
+			<e path="haxe.macro.Binop"/>
+			<t path="haxe.macro.Expr"/>
+			<t path="haxe.macro.Expr"/>
+		</EBinop>
+		<EArrayDecl a="values"><c path="Array"><t path="haxe.macro.Expr"/></c></EArrayDecl>
+		<EArray a="e1:e2">
+			<t path="haxe.macro.Expr"/>
+			<t path="haxe.macro.Expr"/>
+		</EArray>
+	</enum>
+	<enum path="haxe.macro.ComplexType" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<TPath a="p"><t path="haxe.macro.TypePath"/></TPath>
+		<TParent a="t"><e path="haxe.macro.ComplexType"/></TParent>
+		<TFunction a="args:ret">
+			<c path="Array"><e path="haxe.macro.ComplexType"/></c>
+			<e path="haxe.macro.ComplexType"/>
+		</TFunction>
+		<TExtend a="p:fields">
+			<t path="haxe.macro.TypePath"/>
+			<c path="Array"><t path="haxe.macro.Field"/></c>
+		</TExtend>
+		<TAnonymous a="fields"><c path="Array"><t path="haxe.macro.Field"/></c></TAnonymous>
+	</enum>
+	<typedef path="haxe.macro.TypePath" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr"><a>
+	<sub><t path="Null"><c path="String"/></t></sub>
+	<params><c path="Array"><e path="haxe.macro.TypeParam"/></c></params>
+	<pack><c path="Array"><c path="String"/></c></pack>
+	<name><c path="String"/></name>
+</a></typedef>
+	<enum path="haxe.macro.TypeParam" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<TPType a="t"><e path="haxe.macro.ComplexType"/></TPType>
+		<TPExpr a="e"><t path="haxe.macro.Expr"/></TPExpr>
+	</enum>
+	<typedef path="haxe.macro.Function" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr"><a>
+	<ret><t path="Null"><e path="haxe.macro.ComplexType"/></t></ret>
+	<params><c path="Array"><a>
+	<name><c path="String"/></name>
+	<constraints><c path="Array"><e path="haxe.macro.ComplexType"/></c></constraints>
+</a></c></params>
+	<expr><t path="Null"><t path="haxe.macro.Expr"/></t></expr>
+	<args><c path="Array"><t path="haxe.macro.FunctionArg"/></c></args>
+</a></typedef>
+	<typedef path="haxe.macro.FunctionArg" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr"><a>
+	<value><t path="Null"><t path="haxe.macro.Expr"/></t></value>
+	<type><t path="Null"><e path="haxe.macro.ComplexType"/></t></type>
+	<opt><e path="Bool"/></opt>
+	<name><c path="String"/></name>
+</a></typedef>
+	<typedef path="haxe.macro.Metadata" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr"><c path="Array"><a>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<params><c path="Array"><t path="haxe.macro.Expr"/></c></params>
+	<name><c path="String"/></name>
+</a></c></typedef>
+	<typedef path="haxe.macro.Field" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr"><a>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<name><c path="String"/></name>
+	<meta><t path="haxe.macro.Metadata"/></meta>
+	<kind><e path="haxe.macro.FieldType"/></kind>
+	<doc><t path="Null"><c path="String"/></t></doc>
+	<access><c path="Array"><e path="haxe.macro.Access"/></c></access>
+</a></typedef>
+	<enum path="haxe.macro.Access" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<AStatic/>
+		<APublic/>
+		<APrivate/>
+		<AOverride/>
+		<AInline/>
+		<ADynamic/>
+	</enum>
+	<enum path="haxe.macro.FieldType" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<FVar a="t:?e">
+			<t path="Null"><e path="haxe.macro.ComplexType"/></t>
+			<t path="haxe.macro.Expr"/>
+		</FVar>
+		<FProp a="get:set:t:?e">
+			<c path="String"/>
+			<c path="String"/>
+			<e path="haxe.macro.ComplexType"/>
+			<t path="haxe.macro.Expr"/>
+		</FProp>
+		<FFun a="f"><t path="haxe.macro.Function"/></FFun>
+	</enum>
+	<typedef path="haxe.macro.TypeDefinition" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr"><a>
+	<pos><t path="haxe.macro.Position"/></pos>
+	<params><c path="Array"><a>
+	<name><c path="String"/></name>
+	<constraints><c path="Array"><e path="haxe.macro.ComplexType"/></c></constraints>
+</a></c></params>
+	<pack><c path="Array"><c path="String"/></c></pack>
+	<name><c path="String"/></name>
+	<meta><t path="haxe.macro.Metadata"/></meta>
+	<kind><e path="haxe.macro.TypeDefKind"/></kind>
+	<isExtern><e path="Bool"/></isExtern>
+	<fields><c path="Array"><t path="haxe.macro.Field"/></c></fields>
+</a></typedef>
+	<enum path="haxe.macro.TypeDefKind" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<TDStructure/>
+		<TDEnum/>
+		<TDClass a="?extend:?implement:?isInterface">
+			<t path="haxe.macro.TypePath"/>
+			<c path="Array"><t path="haxe.macro.TypePath"/></c>
+			<e path="Bool"/>
+		</TDClass>
+	</enum>
+	<class path="haxe.macro.Error" params="" file="C:\Projects\haxe/std/haxe/macro/Expr.hx" module="haxe.macro.Expr">
+		<message public="1"><c path="String"/></message>
+		<pos public="1"><t path="haxe.macro.Position"/></pos>
+		<new public="1" set="method" line="204"><f a="m:p">
+	<c path="String"/>
+	<t path="haxe.macro.Position"/>
+	<e path="Void"/>
+</f></new>
+		<haxe_doc>
+	This error can be used to handle or produce compilation errors in macros.
+</haxe_doc>
 	</class>
 	<class path="haxe.io.BytesInput" params="" file="C:\Projects\haxe/std/haxe/io/BytesInput.hx">
 		<extends path="haxe.io.Input"/>
@@ -1372,6 +2006,7 @@
 	The possible IO errors that can occur
 </haxe_doc>
 	</enum>
+	<class path="erazor.hscript.ReflectMacro" params="" file="src/erazor/hscript/ReflectMacro.hx"/>
 	<class path="Float" params="" file="C:\Projects\haxe/std/StdTypes.hx" module="StdTypes" extern="1"><haxe_doc>
 	The standard Float type, this is a double-precision IEEE 64bit float.
 </haxe_doc></class>
@@ -1761,6 +2396,11 @@
 	element doesn't imply to copy the whole array content everytime.
 </haxe_doc>
 	</class>
+	<class path="erazor.hscript.EnhancedReflect" params="" file="src/erazor/hscript/EnhancedReflect.hx"><getProperty public="1" set="method" line="7" static="1"><f a="o:field">
+	<d/>
+	<c path="String"/>
+	<unknown/>
+</f></getProperty></class>
 	<enum path="ValueType" params="" file="C:\Projects\haxe/std/neko/_std/Type.hx" module="Type">
 		<TUnknown/>
 		<TObject/>
@@ -1898,7 +2538,7 @@
 		Returns the list of a class static fields.
 	</haxe_doc>
 		</getClassFields>
-		<getEnumConstructs public="1" set="method" line="158" static="1">
+		<getEnumConstructs public="1" set="method" line="161" static="1">
 			<f a="e">
 				<c path="Enum"><d/></c>
 				<c path="Array"><c path="String"/></c>
@@ -1907,7 +2547,7 @@
 		Returns all the available constructor names for an enum.
 	</haxe_doc>
 		</getEnumConstructs>
-		<typeof public="1" set="method" line="163" static="1">
+		<typeof public="1" set="method" line="166" static="1">
 			<f a="v">
 				<d/>
 				<e path="ValueType"/>
@@ -1916,7 +2556,7 @@
 		Returns the runtime type of a value.
 	</haxe_doc>
 		</typeof>
-		<enumEq public="1" params="T" set="method" line="185" static="1">
+		<enumEq public="1" params="T" set="method" line="188" static="1">
 			<f a="a:b">
 				<c path="enumEq.T"/>
 				<c path="enumEq.T"/>
@@ -1926,7 +2566,7 @@
 		Recursively compare two enums constructors and parameters.
 	</haxe_doc>
 		</enumEq>
-		<enumConstructor public="1" set="method" line="200" static="1">
+		<enumConstructor public="1" set="method" line="203" static="1">
 			<f a="e">
 				<d/>
 				<c path="String"/>
@@ -1935,7 +2575,7 @@
 		Returns the constructor of an enum
 	</haxe_doc>
 		</enumConstructor>
-		<enumParameters public="1" set="method" line="204" static="1">
+		<enumParameters public="1" set="method" line="207" static="1">
 			<f a="e">
 				<d/>
 				<c path="Array"><d/></c>
@@ -1944,7 +2584,7 @@
 		Returns the parameters of an enum
 	</haxe_doc>
 		</enumParameters>
-		<enumIndex public="1" get="inline" set="null" line="208" static="1">
+		<enumIndex public="1" get="inline" set="null" line="211" static="1">
 			<f a="e">
 				<d/>
 				<c path="Int"/>
@@ -1953,6 +2593,15 @@
 		Returns the index of the constructor of an enum
 	</haxe_doc>
 		</enumIndex>
+		<allEnums public="1" params="T" set="method" line="215" static="1">
+			<f a="e">
+				<c path="Enum"><c path="allEnums.T"/></c>
+				<c path="Array"><c path="allEnums.T"/></c>
+			</f>
+			<haxe_doc>
+		Returns the list of all enum values that don't take any parameter.
+	</haxe_doc>
+		</allEnums>
 		<haxe_doc>
 	The haXe Reflection API enables you to retreive informations about any value,
 	Classes and Enums at runtime.
@@ -1967,13 +2616,18 @@
 	</class>
 	<class path="erazor.hscript.EnhancedInterp" params="" file="src/erazor/hscript/EnhancedInterp.hx">
 		<extends path="hscript.Interp"/>
-		<call set="method" line="13" override="1"><f a="o:f:args">
+		<get set="method" line="20" override="1"><f a="o:f">
+	<d/>
+	<c path="String"/>
+	<d/>
+</f></get>
+		<call set="method" line="30" override="1"><f a="o:f:args">
 	<d/>
 	<d/>
 	<c path="Array"><d/></c>
 	<d/>
 </f></call>
-		<new public="1" set="method" line="6"><f a=""><e path="Void"/></f></new>
+		<new public="1" set="method" line="13"><f a=""><e path="Void"/></f></new>
 	</class>
 	<class path="haxe.FastCell" params="T" file="C:\Projects\haxe/std/haxe/FastList.hx" module="haxe.FastList">
 		<elt public="1"><c path="haxe.FastCell.T"/></elt>
@@ -2162,6 +2816,22 @@
 	The basic String class.
 </haxe_doc>
 	</class>
+	<class path="haxe.io.BytesOutput" params="" file="C:\Projects\haxe/std/haxe/io/BytesOutput.hx">
+		<extends path="haxe.io.Output"/>
+		<b><c path="haxe.io.BytesBuffer"/></b>
+		<writeByte public="1" set="method" line="44" override="1"><f a="c">
+	<c path="Int"/>
+	<e path="Void"/>
+</f></writeByte>
+		<writeBytes public="1" set="method" line="52" override="1"><f a="buf:pos:len">
+	<c path="haxe.io.Bytes"/>
+	<c path="Int"/>
+	<c path="Int"/>
+	<c path="Int"/>
+</f></writeBytes>
+		<getBytes public="1" set="method" line="126"><f a=""><c path="haxe.io.Bytes"/></f></getBytes>
+		<new public="1" set="method" line="35"><f a=""><e path="Void"/></f></new>
+	</class>
 	<class path="Array" params="T" file="C:\Projects\haxe/std/neko/_std/Array.hx">
 		<new1 params="T" set="method" line="36" static="1"><f a="a:l">
 	<c path="neko.NativeArray"><c path="new1.T"/></c>
@@ -2315,13 +2985,13 @@
 		<__set set="method" line="250"><f a="pos:v">
 	<c path="Int"/>
 	<c path="Array.T"/>
-	<e path="Void"/>
+	<c path="Array.T"/>
 </f></__set>
-		<__double set="method" line="264"><f a="l">
+		<__double set="method" line="265"><f a="l">
 	<c path="Int"/>
 	<e path="Void"/>
 </f></__double>
-		<__neko set="method" line="279"><f a=""><c path="neko.NativeArray"><c path="Array.T"/></c></f></__neko>
+		<__neko set="method" line="280"><f a=""><c path="neko.NativeArray"><c path="Array.T"/></c></f></__neko>
 		<new public="1" set="method" line="31"><f a=""><e path="Void"/></f></new>
 		<haxe_doc>
 	An Array is a storage for values. You can access it using indexes or
@@ -2329,21 +2999,37 @@
 	is less memory and CPU consuming, unless you really need indexed access.
 </haxe_doc>
 	</class>
-	<class path="haxe.io.BytesOutput" params="" file="C:\Projects\haxe/std/haxe/io/BytesOutput.hx">
-		<extends path="haxe.io.Output"/>
-		<b><c path="haxe.io.BytesBuffer"/></b>
-		<writeByte public="1" set="method" line="44" override="1"><f a="c">
-	<c path="Int"/>
-	<e path="Void"/>
-</f></writeByte>
-		<writeBytes public="1" set="method" line="52" override="1"><f a="buf:pos:len">
-	<c path="haxe.io.Bytes"/>
-	<c path="Int"/>
-	<c path="Int"/>
-	<c path="Int"/>
-</f></writeBytes>
-		<getBytes public="1" set="method" line="126"><f a=""><c path="haxe.io.Bytes"/></f></getBytes>
-		<new public="1" set="method" line="35"><f a=""><e path="Void"/></f></new>
+	<class path="haxe.rtti.Meta" params="" file="C:\Projects\haxe/std/haxe/rtti/Meta.hx">
+		<getType public="1" set="method" line="35" static="1">
+			<f a="t">
+				<d/>
+				<d><c path="Array"><d/></c></d>
+			</f>
+			<haxe_doc>
+		Returns the metadata that were declared for the given type (class or enum)
+	</haxe_doc>
+		</getType>
+		<getStatics public="1" set="method" line="43" static="1">
+			<f a="t">
+				<d/>
+				<d><d><c path="Array"><d/></c></d></d>
+			</f>
+			<haxe_doc>
+		Returns the metadata that were declared for the given class fields or enum constructors
+	</haxe_doc>
+		</getStatics>
+		<getFields public="1" set="method" line="51" static="1">
+			<f a="t">
+				<d/>
+				<d><d><c path="Array"><d/></c></d></d>
+			</f>
+			<haxe_doc>
+		Returns the metadata that were declared for the given class static fields
+	</haxe_doc>
+		</getFields>
+		<haxe_doc>
+	An api to access classes and enums metadata at runtime.
+</haxe_doc>
 	</class>
 	<class path="EReg" params="" file="C:\Projects\haxe/std/neko/_std/EReg.hx">
 		<regexp_new_options line="157" static="1"><f a=":">
@@ -2482,22 +3168,24 @@
 	</enum>
 	<class path="erazor.Parser" params="" file="src/erazor/Parser.hx">
 		<at line="21" static="1"><c path="String"/></at>
+		<bracketMismatch line="33" static="1"><c path="String"/></bracketMismatch>
 		<condMatch><c path="EReg"/></condMatch>
 		<inConditionalMatch><c path="EReg"/></inConditionalMatch>
 		<variableChar><c path="EReg"/></variableChar>
 		<context><e path="erazor._Parser.ParseContext"/></context>
+		<bracketStack><c path="Array"><e path="erazor._Parser.ParseContext"/></c></bracketStack>
 		<conditionalStack><c path="Int"/></conditionalStack>
-		<parseScriptPart set="method" line="32"><f a="template:startBrace:endBrace">
+		<parseScriptPart set="method" line="35"><f a="template:startBrace:endBrace">
 	<c path="String"/>
 	<c path="String"/>
 	<c path="String"/>
 	<c path="String"/>
 </f></parseScriptPart>
-		<parseContext set="method" line="81"><f a="template">
+		<parseContext set="method" line="84"><f a="template">
 	<c path="String"/>
 	<e path="erazor._Parser.ParseContext"/>
 </f></parseContext>
-		<accept set="method" line="95"><f a="template:acceptor:throwAtEnd">
+		<accept set="method" line="101"><f a="template:acceptor:throwAtEnd">
 	<c path="String"/>
 	<f a="">
 		<c path="String"/>
@@ -2506,21 +3194,21 @@
 	<e path="Bool"/>
 	<c path="String"/>
 </f></accept>
-		<isIdentifier set="method" line="102"><f a="char:?first">
+		<isIdentifier set="method" line="108"><f a="char:?first">
 	<c path="String"/>
 	<e path="Bool"/>
 	<e path="Bool"/>
 </f></isIdentifier>
-		<acceptIdentifier set="method" line="109"><f a="template">
+		<acceptIdentifier set="method" line="115"><f a="template">
 	<c path="String"/>
 	<c path="String"/>
 </f></acceptIdentifier>
-		<acceptBracket set="method" line="121"><f a="template:bracket">
+		<acceptBracket set="method" line="127"><f a="template:bracket">
 	<c path="String"/>
 	<c path="String"/>
 	<c path="String"/>
 </f></acceptBracket>
-		<parseBlock set="method" line="129">
+		<parseBlock set="method" line="135">
 			<f a="template">
 				<c path="String"/>
 				<t path="erazor._Parser.Block"/>
@@ -2529,28 +3217,28 @@
 	 * Main block parse method, called from parse().
 	 </haxe_doc>
 		</parseBlock>
-		<parseConditional set="method" line="135"><f a="template">
+		<parseConditional set="method" line="141"><f a="template">
 	<c path="String"/>
 	<t path="erazor._Parser.Block"/>
 </f></parseConditional>
-		<peek set="method" line="141"><f a="template:?offset">
+		<peek set="method" line="147"><f a="template:?offset">
 	<c path="String"/>
 	<c path="Int"/>
 	<c path="String"/>
 </f></peek>
-		<parseVariable set="method" line="146"><f a="template">
+		<parseVariable set="method" line="152"><f a="template">
 	<c path="String"/>
 	<t path="erazor._Parser.Block"/>
 </f></parseVariable>
-		<parseVariableChar set="method" line="190"><f a="char">
+		<parseVariableChar set="method" line="196"><f a="char">
 	<c path="String"/>
 	<e path="erazor._Parser.ParseResult"/>
 </f></parseVariableChar>
-		<parseCodeBlock set="method" line="195"><f a="template">
+		<parseCodeBlock set="method" line="201"><f a="template">
 	<c path="String"/>
 	<t path="erazor._Parser.Block"/>
 </f></parseCodeBlock>
-		<parseString set="method" line="239"><f a="str:modifier:throwAtEnd">
+		<parseString set="method" line="247"><f a="str:modifier:throwAtEnd">
 	<c path="String"/>
 	<f a="">
 		<c path="String"/>
@@ -2559,15 +3247,15 @@
 	<e path="Bool"/>
 	<c path="String"/>
 </f></parseString>
-		<parseLiteral set="method" line="284"><f a="template">
+		<parseLiteral set="method" line="292"><f a="template">
 	<c path="String"/>
 	<t path="erazor._Parser.Block"/>
 </f></parseLiteral>
-		<escapeLiteral set="method" line="324"><f a="input">
+		<escapeLiteral set="method" line="334"><f a="input">
 	<c path="String"/>
 	<c path="String"/>
 </f></escapeLiteral>
-		<parse public="1" set="method" line="334">
+		<parse public="1" set="method" line="344">
 			<f a="template">
 				<c path="String"/>
 				<c path="Array"><e path="erazor.TBlock"/></c>
@@ -2578,7 +3266,7 @@
 	 * @return
 	 </haxe_doc>
 		</parse>
-		<new public="1" set="method" line="354"><f a=""><e path="Void"/></f></new>
+		<new public="1" set="method" line="367"><f a=""><e path="Void"/></f></new>
 	</class>
 	<typedef path="haxe.PosInfos" params="" file="C:\Projects\haxe/std/haxe/PosInfos.hx"><a>
 	<methodName><c path="String"/></methodName>
