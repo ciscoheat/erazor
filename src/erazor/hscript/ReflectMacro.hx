@@ -11,6 +11,7 @@ class ReflectMacro {
 		return { pos : Context.currentPos() , expr : EBlock([]) };
 	}
 
+	#if macro 
 	public static function onGenerate( types : Array<Type> ){
 		for( type in types ){
 			switch( type ){
@@ -36,4 +37,5 @@ class ReflectMacro {
 			}
 		}
 	}
+	#end
 }
