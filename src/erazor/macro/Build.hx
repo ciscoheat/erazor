@@ -3,6 +3,8 @@ import erazor.Parser;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
+import neko.FileSystem;
+import neko.io.File;
 
 using Lambda;
 /**
@@ -40,6 +42,19 @@ class Build
 				case ":template", "template":
 					var s = getString(meta.params[0]);
 					return build(s, meta.params[0].pos, t);
+				case ":includeTemplate", "includeTemplate":
+					var srcLocation = Context.resolvePath(cls.module.split(".").join("/") + ".hx");
+					var path = srcLocation.split("/");
+					path.pop();
+					
+					var templatePath = getString(meta.params[0]);
+					templatePath = path.join("/") + "/" + templatePath;
+					
+					if (! FileSystem.exists(templatePath)) throw new Error("File " + templatePath + " not found.", meta.params[0].pos);
+					var contents = File.getContent(templatePath);
+					var pos = Context.makePosition( { min:0, max:contents.length, file:templatePath } );
+					
+					return build(contents, pos, t);
 			}
 		}
 		
