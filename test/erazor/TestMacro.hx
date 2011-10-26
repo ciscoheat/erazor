@@ -71,7 +71,7 @@ class MacroTest2 extends erazor.macro.Template<{numbers:Array<Int>}>
 	
 }
 
-@:template("@for(u in users){@if(u.name == 'Boris'){<b>@u.name</b>}else if(u.name == 'Doris'){<i>@u.name</i>}else{@u.name}<br>}")
+@:includeTemplate("Test.erazor")
 class MacroTest3 extends erazor.macro.Template<{users:Array<{name:String}>}>
 {
 	
