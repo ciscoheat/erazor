@@ -28,7 +28,7 @@ class TestMacro
 		var template = new MacroTest0();
 		Assert.equals('Hello Boris', template.execute(vars));
 	}
-	*/
+*/
 	public function test_If_basic_vars_are_parsed_correctly_with_whitespace()
 	{
 		var template = new MacroTest1();
@@ -50,6 +50,19 @@ class TestMacro
 		
 		var template = new MacroTest5();
 		Assert.equals("987654321", template.execute({}));
+		
+	}
+	
+	public function test_Static_method_call():Void
+	{
+		var template = new MacroTest6();
+		Assert.equals("-1", template.execute({x:Math.PI}));
+	}
+	
+	public function test_Block_with_enum_match():Void
+	{
+		var template = new MacroTest7();
+		Assert.equals("object float instance of String ", template.execute({vars:[{}, Math.PI, "hello!"]}));
 	}
 }
 
@@ -87,4 +100,25 @@ class MacroTest4 extends erazor.macro.Template<Dynamic>
 class MacroTest5 extends erazor.macro.Template<Dynamic>
 {
 	
+}
+
+@:template("@Math.cos(x)")
+class MacroTest6 extends erazor.macro.Template<{x:Float}>
+{
+	
+}
+
+@:template("@for (_var in vars)
+	{@{
+			var x = switch(Type.typeof(_var))
+			{
+				case TObject: \"object \";
+				case TFloat: \"float \";
+				case TClass(i): \"instance of \" + Type.getClassName(i) + \" \";
+				default: \"other \";
+			}
+		}@x}")
+class MacroTest7 extends erazor.macro.Template<{vars:Array<Dynamic>}>
+{
+
 }

@@ -1,0 +1,10 @@
+
+# swf 8
+-main TestAll
+-cp test
+-cp src
+-lib utest
+-lib hscript
+-swf bin/TestAll.8.swf
+# @tm-preview
+

@@ -187,7 +187,7 @@ class Build
 		return fields;
 	}
 	
-	static function changeExpr(e:Null<Expr>, contextExpr:Expr, declaredVars:Array<Hash<Bool>>):Null<Expr>
+	static function changeExpr(e:Null<Expr>, contextExpr:Expr, declaredVars:Array<Hash<Bool>>, ?inCase = false):Null<Expr>
 	{
 		if (e == null)
 			return null;
@@ -204,16 +204,13 @@ class Build
 				switch (c)
 				{
 					case CIdent(s):
-						if (!lookupVar(s, declaredVars))
+						if (inCase)
+						{
+							addVar(s, declaredVars);
+							e;
+						} else if (!lookupVar(s, declaredVars))
 						{
 							{expr:EField(contextExpr, s), pos:e.pos };
-						} else {
-							e;
-						}
-					case CType(s):
-						if (!lookupVar(s, declaredVars))
-						{
-							{expr:EType(contextExpr, s), pos:e.pos };
 						} else {
 							e;
 						}
@@ -226,7 +223,7 @@ class Build
 			case EParenthesis( e1 ):  { expr:EParenthesis(_recurse(e1)), pos:e.pos };
 			case EObjectDecl( fields ): { expr:EObjectDecl(fields.map(function(f) return { field:f.field, expr:_recurse(f.expr) } ).array()), pos:e.pos };
 			case EArrayDecl( values ): { expr:EArrayDecl(values.map(_recurse).array()), pos:e.pos };
-			case ECall( e1, params): { expr:ECall(_recurse(e1), params.map(_recurse).array()), pos:e.pos };
+			case ECall( e1, params): { expr:ECall(_recurse(e1), params.map(function(e) return changeExpr(e, contextExpr, declaredVars, inCase)).array()), pos:e.pos };
 			case ENew( t, params ): { expr:ENew(t, params.map(_recurse).array()), pos:e.pos};
 			case EUnop( op, postFix, e1 ): { expr:EUnop(op, postFix, _recurse(e1)), pos:e.pos };
 			case EVars( vars): { expr:EVars(vars.map(function(v) {
@@ -257,9 +254,15 @@ class Build
 			case EWhile( econd, e1, normalWhile ): { expr:EWhile(_recurse(econd), _recurse(e1), normalWhile), pos:e.pos };
 			case ESwitch( e, cases, edef ):
 				{expr:ESwitch(_recurse(e),
-					cases.map(function(c) return {
-						values:c.values.map(_recurse).array(),
-						expr:_recurse(c.expr)
+					cases.map(function(c)
+					{
+						declaredVars.push(new Hash());
+						var ret = {
+							values:c.values.map(function(e) return changeExpr(e, contextExpr, declaredVars, true)).array(),
+							expr:_recurse(c.expr)
+						};
+						declaredVars.pop();
+						return ret;
 					}).array(), _recurse(edef)),
 				pos:pos}
 			case ETry( e , catches ): {expr:ETry(_recurse(e), catches.map(function(c) return { name:c.name, type:c.type, expr:_recurse(c.expr) } ).array()), pos:pos };

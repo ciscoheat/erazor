@@ -1,0 +1,73 @@
+
+# swf 8
+-main TestAll
+-cp test
+-cp src
+-lib utest
+-lib hscript
+-swf bin/TestAll.8.swf
+# @tm-preview
+
+--next
+
+# swf 9
+-main TestAll
+-cp test
+-cp src
+-lib utest
+-lib hscript
+-swf9 bin/TestAll.9.swf
+# @tm-preview
+
+--next
+
+# js
+-main TestAll
+-cp test
+-cp src
+-lib utest
+-lib hscript
+-js bin/TestAll.js
+# @tm-preview
+
+--next
+
+# php
+-main TestAll
+-cp test
+-cp src
+-lib utest
+-lib hscript
+-php bin/TestAll
+-cmd echo "==========<PHP>=========="
+-cmd php bin/TestAll/index.php
+-cmd echo "==========</PHP>=========="
+
+--next
+
+# neko
+-main TestAll
+-cp test
+-cp src
+-lib utest
+-lib hscript
+-neko bin/TestAll.n
+-cmd echo "==========<NEKO>=========="
+-cmd neko bin/TestAll.n
+-cmd echo "==========</NEKO>=========="
+
+--next 
+
+# cpp
+-main TestAll
+-cp test
+-cp src
+-lib utest
+-lib hscript
+-cpp bin/TestAll
+-cmd echo "==========<CPP>=========="
+-cmd bin/TestAll/TestAll
+-cmd echo "==========</CPP>=========="
+
+
+# @tm-preview

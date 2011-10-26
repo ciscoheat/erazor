@@ -1,4 +1,4 @@
-﻿package erazor;
+package erazor;
 
 private typedef Block = {
 	var block : TBlock;
@@ -367,9 +367,16 @@ class Parser
 	public function new()
 	{
 		// Some are quite simple, could be made with string functions instead for speed
+#if macro
+		condMatch = ~/^@(if|for|while|switch)[^A-Za-z0-9]/;
+		inConditionalMatch = ~/^(}[ \t\r\n]*else if[^A-Za-z0-9]|}[ \t\r\n]*else[ \t\r\n]*{)/;
+		//variableMatch = ~/^@[_A-Za-z][\w\.]*([\(\[])?/;
+		variableChar = ~/^[_A-Za-z0-9\.]$/;
+#else
 		condMatch = ~/^@(?:if|for|while)\b/;
 		inConditionalMatch = ~/^(?:\}[\s\r\n]*else if\b|\}[\s\r\n]*else[\s\r\n]*{)/;
 		//variableMatch = ~/^@[_A-Za-z][\w\.]*([\(\[])?/;
 		variableChar = ~/^[_\w\.]$/;
+#end
 	}
 }
