@@ -24,7 +24,7 @@ class Build
 		
 		var params = cls.superClass.params[0];
 		
-		var t = switch(Context.parse("{var _:" + typeToString(params) + ";}", cls.pos).expr)
+		var t = switch(Context.parse("{var _:" + typeToString(params, cls.pos) + ";}", cls.pos).expr)
 		{
 			case EBlock(b):
 				switch(b[0].expr)
@@ -79,7 +79,7 @@ class Build
 		return ret;
 	}
 	
-	static function typeToString(type:Type):Null<String> 
+	static function typeToString(type:Type, pos:Position):Null<String> 
 	{
 		if (type == null)
 			return null;
@@ -88,11 +88,11 @@ class Build
 		{
 			case TMono( t ):
 				var t2 = t.get();
-				typeToString(t2);
-			case TEnum( t, params ): t.toString() + args(params);
-			case TInst( t, params ): t.toString() + args(params);
-			case TType( t, params ): t.toString() + args(params);
-			case TFun( args, ret ): Lambda.map(args, function(arg) return typeToString(arg.t)).join("->") + "->" + typeToString(ret);
+				typeToString(t2, pos);
+			case TEnum( t, params ): t.toString() + args(params, pos);
+			case TInst( t, params ): t.toString() + args(params, pos);
+			case TType( t, params ): t.toString() + args(params, pos);
+			case TFun( args, ret ): Lambda.map(args, function(arg) return typeToString(arg.t, pos)).join("->") + "->" + typeToString(ret, pos);
 			case TAnonymous( a ):
 				var sbuf = new StringBuf();
 				sbuf.add("{ ");
@@ -100,16 +100,23 @@ class Build
 				for (a in a.get().fields)
 				{
 					if (first) first = false; else sbuf.add(", ");
+					
+					var first = a.name.charCodeAt(0);
+					if (first >= 'A'.code && first <= 'Z'.code)
+					{
+						Context.warning("Capitalized variables won't behave correctly inside a erazor macro context.", pos);
+					}
+					
 					sbuf.add(a.name);
 					sbuf.add(" : ");
-					sbuf.add(typeToString(a.type));
+					sbuf.add(typeToString(a.type, pos));
 				}
 				sbuf.add(" }");
 				
 				sbuf.toString();
 			case TDynamic( t ):
 				if (t != null)
-					"Dynamic<" + typeToString(t) + ">";
+					"Dynamic<" + typeToString(t, pos) + ">";
 				else
 					"Dynamic";
 #if haxe_209
@@ -118,11 +125,11 @@ class Build
 		}
 	}
 	
-	static function args(args:Array<Type>):String 
+	static function args(args:Array<Type>, pos):String 
 	{
 		if (args.length > 0)
 		{
-			return "<" + Lambda.map(args, typeToString).join(", ") + ">";
+			return "<" + Lambda.map(args, function(t) return typeToString(t, pos)).join(", ") + ">";
 		} else {
 			return "";
 		}
