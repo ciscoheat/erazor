@@ -70,6 +70,12 @@ class TestMacro
 		var template = new MacroTest8();
 		Assert.equals(haxe.io.Bytes.ofString("Hello, World!").toHex(), template.execute( { str:"Hello, World!" } ));
 	}
+	
+	public function test_Explicit_import():Void
+	{
+		var template = new MacroTest9();
+		Assert.equals(haxe.io.Bytes.ofString("Hello, World!").toHex(), template.execute( { str:"Hello, World!" } ));
+	}
 }
 
 @:template("Hello @name")
@@ -131,6 +137,12 @@ class MacroTest7 extends erazor.macro.Template<{vars:Array<Dynamic>}>
 
 @:template("@haxe.io.Bytes.ofString(str).toHex()")
 class MacroTest8 extends erazor.macro.Template<{str:String}>
+{
+	
+}
+
+@:template("@{var Bytes = haxe.io.Bytes;}@Bytes.ofString(str).toHex()")
+class MacroTest9 extends erazor.macro.Template<{str:String}>
 {
 	
 }
