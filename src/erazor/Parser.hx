@@ -368,7 +368,7 @@ class Parser
 	{
 		// Some are quite simple, could be made with string functions instead for speed
 #if macro
-		condMatch = ~/^@(if|for|while|switch)[^A-Za-z0-9]/;
+		condMatch = ~/^@(if|for|while)[^A-Za-z0-9]/;
 		inConditionalMatch = ~/^(}[ \t\r\n]*else if[^A-Za-z0-9]|}[ \t\r\n]*else[ \t\r\n]*{)/;
 		//variableMatch = ~/^@[_A-Za-z][\w\.]*([\(\[])?/;
 		variableChar = ~/^[_A-Za-z0-9\.]$/;
