@@ -187,7 +187,7 @@ class Build
 		return fields;
 	}
 	
-	static function changeExpr(e:Null<Expr>, contextExpr:Expr, declaredVars:Array<Hash<Bool>>, ?inCase = false):Null<Expr>
+	static function changeExpr(e:Null<Expr>, contextExpr:Expr, declaredVars:Array<Hash<Bool>>, ?inCase = false, ?isType = false):Null<Expr>
 	{
 		if (e == null)
 			return null;
@@ -208,7 +208,7 @@ class Build
 						{
 							addVar(s, declaredVars);
 							e;
-						} else if (!lookupVar(s, declaredVars))
+						} else if (!isType && !lookupVar(s, declaredVars))
 						{
 							{expr:EField(contextExpr, s), pos:e.pos };
 						} else {
@@ -218,9 +218,9 @@ class Build
 				}
 			case EArray( e1, e2 ): { expr:EArray(_recurse(e1), _recurse(e2)), pos:e.pos };
 			case EBinop( op, e1, e2): { expr:EBinop(op, _recurse(e1), _recurse(e2)), pos:e.pos };
-			case EField( e1, field ): { expr:EField(_recurse(e1), field), pos:e.pos };
-			case EType( e1, field ): { expr:EType(_recurse(e1), field), pos:e.pos };
-			case EParenthesis( e1 ):  { expr:EParenthesis(_recurse(e1)), pos:e.pos };
+			case EField( e1, field ): { expr:EField(changeExpr(e1, contextExpr, declaredVars, false, isType), field), pos:e.pos };
+			case EType( e1, field ): { expr:EType(changeExpr(e1, contextExpr, declaredVars, false, true), field), pos:e.pos };
+			case EParenthesis( e1 ):  { expr:EParenthesis(changeExpr(e1, contextExpr, declaredVars, inCase, isType)), pos:e.pos };
 			case EObjectDecl( fields ): { expr:EObjectDecl(fields.map(function(f) return { field:f.field, expr:_recurse(f.expr) } ).array()), pos:e.pos };
 			case EArrayDecl( values ): { expr:EArrayDecl(values.map(_recurse).array()), pos:e.pos };
 			case ECall( e1, params): { expr:ECall(_recurse(e1), params.map(function(e) return changeExpr(e, contextExpr, declaredVars, inCase)).array()), pos:e.pos };
