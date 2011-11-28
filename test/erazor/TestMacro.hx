@@ -19,7 +19,7 @@ class TestMacro
 		var template = new MacroTest0();
 		Assert.equals('Hello Boris', template.execute( { name: 'Boris' } ));
 	}
-/*
+/* not supported
 	public function test_If_basic_vars_are_parsed_correctly_with_hash()
 	{
 		var vars = new Hash<String>();
@@ -159,3 +159,10 @@ class MacroTest10 extends erazor.macro.Template<Dynamic>
 {
 	
 }
+
+/*
+@:includeTemplate('Test2.erazor')
+class MacroTest11 extends erazor.macro.Template<Dynamic>
+{
+	
+}*/

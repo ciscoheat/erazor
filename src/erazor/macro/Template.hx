@@ -12,4 +12,11 @@ class Template<T>
 	{
 		
 	}
+	
+#if display
+	public function execute(context:T):String
+	{
+		return null;
+	}
+#end
 }
