@@ -1,7 +1,9 @@
-﻿package erazor;
+package erazor;
+import erazor.error.ParserError;
 
 private typedef Block = {
 	var block : TBlock;
+	var start : Int;
 	var length : Int;
 }
 
@@ -29,6 +31,8 @@ class Parser
 	private var context : ParseContext;
 	private var bracketStack : Array<ParseContext>;
 	private var conditionalStack : Int;
+	
+	private var pos : Int;
 	
 	private static var bracketMismatch = "Bracket mismatch! Inside template, non-paired brackets, '{' or '}', should be replaced by @{'{'} and @{'}'}.";
 
@@ -58,7 +62,7 @@ class Parser
 						if(stack == 0)
 							return template.substr(0, i+1);
 						if (stack < 0)
-							throw 'Unbalanced braces for block: ' + template.substr(0, 100) + " ...";						
+							throw new ParserError( 'Unbalanced braces for block: ', pos,  template.substr(0, 100) );
 					
 					case '"':
 						insideDoubleQuote = true;
@@ -78,7 +82,7 @@ class Parser
 		}
 		
 		//trace(startBrace); trace(endBrace);
-		throw 'Failed to find a closing delimiter for the script block: ' + template.substr(0, 100);
+		throw new ParserError( 'Failed to find a closing delimiter for the script block: ', this.pos, template.substr(0, 100) );
 	}
 	
 	function parseContext(template : String) : ParseContext
@@ -141,7 +145,7 @@ class Parser
 	function parseConditional(template : String) : Block
 	{
 		var str = parseScriptPart(template, '', '{');
-		return { block: TBlock.codeBlock(str.substr(1)), length: str.length };
+		return { block: TBlock.codeBlock(str.substr(1)), length: str.length, start:this.pos };
 	}
 	
 	function peek(template : String, offset = 0)
@@ -190,12 +194,12 @@ class Parser
 			}
 		} while (char != null);
 		
-		return { block: TBlock.printBlock(output), length: output.length + 1 };
+		return { block: TBlock.printBlock(output), length: output.length + 1, start:this.pos };
 	}
 
 	function parseVariableChar(char : String) : ParseResult
 	{
-		return variableChar.match(char) ? ParseResult.keepGoing : ParseResult.doneSkipCurrent;
+		return (variableChar.match(char)#if macro && variableChar.matchedPos().pos == 0 #end) ? ParseResult.keepGoing : ParseResult.doneSkipCurrent;
 	}
 
 	function parseCodeBlock(template : String) : Block
@@ -204,22 +208,22 @@ class Parser
 		if (bracketStack.length > 0 && peek(template) == '}')
 		{
 			// It may not be an end, just a continuation (else if, else)
-			if (inConditionalMatch.match(template))
+			if (inConditionalMatch.match(template) #if macro && inConditionalMatch.matchedPos().pos == 0 #end)
 			{
 				var str = parseScriptPart(template, '', '{');
-				return { block: TBlock.codeBlock(str), length: str.length };
+				return { block: TBlock.codeBlock(str), length: str.length, start:this.pos };
 			}
 			
 			if (switch (bracketStack.pop()) {
 				case code: --conditionalStack < 0;
 				default: true;
-			}) throw bracketMismatch;
+			}) throw new ParserError( bracketMismatch, this.pos );
 			
-			return { block: TBlock.codeBlock('}'), length: 1 };
+			return { block: TBlock.codeBlock('}'), length: 1, start:this.pos };
 		}
 		
 		// Test for conditional code block
-		if (condMatch.match(template))
+		if (condMatch.match(template) #if macro && condMatch.matchedPos().pos == 0 #end)
 		{
 			bracketStack.push(code);
 			++conditionalStack;
@@ -239,9 +243,9 @@ class Parser
 		var noBraces = StringTools.trim(str.substr(1, str.length - 2));
 		
 		if(startBrace == '{')
-			return { block: TBlock.codeBlock(noBraces), length: str.length + 1 };
+			return { block: TBlock.codeBlock(noBraces), length: str.length + 1, start:this.pos };
 		else // (
-			return { block: TBlock.printBlock(noBraces), length: str.length + 1 };
+			return { block: TBlock.printBlock(noBraces), length: str.length + 1, start:this.pos };
 	}
 	
 	private function parseString(str : String, modifier : String -> ParseResult, throwAtEnd : Bool) : String
@@ -284,7 +288,7 @@ class Parser
 		}
 		
 		if(throwAtEnd)
-			throw 'Failed to find a closing delimiter: ' + str.substr(0, 100);
+			throw new ParserError( 'Failed to find a closing delimiter: ', this.pos, str.substr(0, 100) );
 	
 		return str;
 	}
@@ -302,7 +306,8 @@ class Parser
 					if (len > i + 1 && template.charAt(i + 1) != Parser.at) {
 						return { 
 							block: TBlock.literal(escapeLiteral(template.substr(0, i))), 
-							length: i 
+							length: i,
+							start: this.pos
 						};
 					}
 					++i;
@@ -312,13 +317,14 @@ class Parser
 							case code:
 								return { 
 									block: TBlock.literal(escapeLiteral(template.substr(0, i))),
-									length: i 
+									length: i,
+									start:this.pos
 								};
 							case literal:
 								bracketStack.pop();
 						}
 					} else {
-						 throw bracketMismatch;
+						 throw new ParserError( bracketMismatch, this.pos );
 					}
 				case '{':
 					bracketStack.push(literal);
@@ -327,7 +333,8 @@ class Parser
 		
 		return { 
 			block: TBlock.literal(escapeLiteral(template)), 
-			length: len
+			length: len,
+			start: this.pos
 		};
 	}
 	
@@ -343,6 +350,8 @@ class Parser
 	 */
 	public function parse(template : String) : Array<TBlock>
 	{
+		this.pos = 0;
+		
 		var output = new Array<TBlock>();		
 		bracketStack = [];
 		conditionalStack = 0;
@@ -356,9 +365,35 @@ class Parser
 				output.push(block.block);
 				
 			template = template.substr(block.length);
+			this.pos += block.length;
 		}
 		
-		if (bracketStack.length != 0) throw bracketMismatch;
+		if (bracketStack.length != 0) throw new ParserError( bracketMismatch, this.pos );
+		
+		return output;
+	}
+	
+	public function parseWithPosition(template:String) : Array<Block>
+	{
+		this.pos = 0;
+		
+		var output = new Array<Block>();		
+		bracketStack = [];
+		conditionalStack = 0;
+		
+		while (template != '')
+		{
+			context = parseContext(template);
+			var block = parseBlock(template);
+			
+			if(block.block != null)
+				output.push(block);
+				
+			template = template.substr(block.length);
+			this.pos += block.length;
+		}
+		
+		if (bracketStack.length != 0) throw new ParserError( bracketMismatch, this.pos );
 		
 		return output;
 	}
@@ -367,9 +402,16 @@ class Parser
 	public function new()
 	{
 		// Some are quite simple, could be made with string functions instead for speed
+#if macro
+		condMatch = ~/^@(if|for|while)[^A-Za-z0-9]/;
+		inConditionalMatch = ~/^(}[ \t\r\n]*else if[^A-Za-z0-9]|}[ \t\r\n]*else[ \t\r\n]*{)/;
+		//variableMatch = ~/^@[_A-Za-z][\w\.]*([\(\[])?/;
+		variableChar = ~/^[_A-Za-z0-9\.]$/;
+#else
 		condMatch = ~/^@(?:if|for|while)\b/;
 		inConditionalMatch = ~/^(?:\}[\s\r\n]*else if\b|\}[\s\r\n]*else[\s\r\n]*{)/;
 		//variableMatch = ~/^@[_A-Za-z][\w\.]*([\(\[])?/;
 		variableChar = ~/^[_\w\.]$/;
+#end
 	}
 }

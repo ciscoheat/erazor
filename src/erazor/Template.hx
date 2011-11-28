@@ -1,4 +1,4 @@
-﻿package erazor;
+package erazor;
 
 import hscript.Interp;
 import erazor.hscript.EnhancedInterp;

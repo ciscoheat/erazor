@@ -6,6 +6,7 @@ class TestAll
 		var runner = new utest.Runner();
 		
 		runner.addCase(new erazor.TestParser());
+		runner.addCase(new erazor.TestMacro());
 		runner.addCase(new erazor.TestScriptBuilder());
 		runner.addCase(new erazor.TestTemplate());
 		
