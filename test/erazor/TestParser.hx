@@ -5,6 +5,7 @@
 
 package erazor;
 
+import erazor.error.ParserError;
 import erazor.Parser;
 import utest.Assert;
 
@@ -212,25 +213,25 @@ class TestParser
 		// Unclosed tags
 		Assert.raises(function() {
 			self.parser.parse('@if (incompleted == true)');
-		});
+		}, ParserError);
 		
 		Assert.raises(function() {
 			self.parser.parse('@{unclosed{{');
-		});
+		}, ParserError);
 		
 		Assert.raises(function() {
 			self.parser.parse("@if(a == 'Oops)}");
-		});
+		}, ParserError);
 		
 		//non-paired brackets
 		
 		Assert.raises(function() {
 			self.parser.parse("@if(true){{}");
-		});
+		}, ParserError);
 		
 		Assert.raises(function() {
 			self.parser.parse("@if(true){}}");
-		});
+		}, ParserError);
 	}
 	
 	public function test_If_paired_brackets_are_parsed_correctly()
