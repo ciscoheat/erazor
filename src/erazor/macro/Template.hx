@@ -10,9 +10,9 @@ class Template<T>
 {
 	public function new()
 	{
-		
+
 	}
-	
+
 #if display
 	public function execute(context:T):String
 	{
