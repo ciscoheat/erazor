@@ -57,6 +57,7 @@ class Build
 					
 					if (! FileSystem.exists(templatePath)) throw new Error("File " + templatePath + " not found.", meta.params[0].pos);
 					
+					Context.registerModuleDependency(Context.getLocalClass().get().module, templatePath);
 					var contents = File.getContent(templatePath);
 					var pos = Context.makePosition( { min:0, max:contents.length, file:templatePath } );
 					
