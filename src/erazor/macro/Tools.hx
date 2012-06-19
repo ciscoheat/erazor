@@ -5,18 +5,33 @@ import haxe.macro.Expr;
 #end
 
 /**
- * Some Tools to 
+ * Some Tools to make it easier to work with Macro Templates
  * @author waneck
  */
 
 class Tools 
 {
-
+	/**
+	 * Allows to set data for the template with the following syntax:
+	 * 
+	 * 		using Tools;
+	 * 		var template = new MyTemplate().setData(a = "a", b = "b", c = "c");
+	 * 
+	 * @param	template	the Template on which we are going to set the data
+	 * @param	fields		rest parameters of the fields to be set. They must follow the convention: field = (value)
+	 * @return	An expression block that sets all the values and has the template var as the last expression.
+	 */
+#if haxe_210
 	@:macro public static function setData(template:ExprOf<Template>, fields:Array<Expr>):Expr
+#else
+	@:macro public static function setData(fields:Array<Expr>):Expr
+#end
 	{
 		var bl = [];
-		//var template = fields.shift();
-		//if (template == null) throw new Error("setData must contain at least the template variable", Context.currentPos())
+#if !haxe_210
+		var template = fields.shift();
+		if (template == null) throw new Error("setData must contain at least the template variable", Context.currentPos());
+#end
 		
 		var templateVar = null;
 		
