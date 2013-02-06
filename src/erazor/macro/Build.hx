@@ -106,6 +106,7 @@ class Build
 
 		return switch(type)
 		{
+			case TAbstract( t, params ): t.toString() + args(params, pos);
 			case TMono( t ):
 				var t2 = t.get();
 				typeToString(t2, pos);
@@ -190,7 +191,7 @@ class Build
 
 		var posInfo = Context.getPosInfos(pos);
 		var min = posInfo.min;
-		var blockPos = parsedBlocks.map(function(block) return { file:posInfo.file, min:min + block.start, max:min + block.start + block.length } ).array();
+		var blockPos = parsedBlocks.map(function(block) return { file : posInfo.file, min:min + block.start, max:min + block.start + block.length } ).array();
 		blockPos.reverse();
 
 		// Make a hscript with the buffer as context.
@@ -273,7 +274,8 @@ class Build
 			var len = pos.max - pos.min;
 
 			var min = pos.min - curPosInfo.carry;
-			var ret = Context.makePosition( { file: info.file, min:min, max:min + len } );
+
+			var ret = Context.makePosition( { file: null == info ? pos.file : info.file, min:min, max:min + len } );
 
 			return ret;
 		}

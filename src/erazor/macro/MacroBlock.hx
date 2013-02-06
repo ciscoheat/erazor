@@ -5,12 +5,12 @@ package erazor.macro;
  * @author Waneck
  */
 
-class MacroBlock 
+class MacroBlock
 {
 
-	public function new() 
+	public function new()
 	{
-		
+
 	}
-	
+
 }
