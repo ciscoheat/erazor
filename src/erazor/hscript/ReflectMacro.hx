@@ -6,7 +6,7 @@ import haxe.macro.Type;
 
 class ReflectMacro {
 
-	@:macro public static function addMeta( ?e:Dynamic ){
+	macro public static function addMeta( ?e:Dynamic ){
 		Context.onGenerate( onGenerate );
 		return { pos : Context.currentPos() , expr : EBlock([]) };
 	}
@@ -15,7 +15,7 @@ class ReflectMacro {
 	public static function onGenerate( types : Array<Type> ){
 		for( type in types ){
 			switch( type ){
-				case TInst( t , params ) :
+				case TInst( t , _ ) :
 				
 					for( f in t.get().fields.get() ){
 						switch( f.kind ){
