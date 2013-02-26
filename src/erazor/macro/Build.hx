@@ -5,8 +5,9 @@ import erazor.ScriptBuilder;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
-import neko.FileSystem;
-import neko.io.File;
+import sys.FileSystem;
+import sys.io.File;
+import haxe.ds.StringMap;
 
 using Lambda;
 /**
@@ -89,7 +90,7 @@ class Build
 				switch(c)
 				{
 					case CString(s): s;
-					case CIdent(s), CType(s): if (acceptIdent) s; else null;
+					case CIdent(s): if (acceptIdent) s; else null;
 					default: null;
 				}
 			default: null;
@@ -114,6 +115,7 @@ class Build
 			case TInst( t, params ): t.toString() + args(params, pos);
 			case TType( t, params ): t.toString() + args(params, pos);
 			case TFun( args, ret ): Lambda.map(args, function(arg) return typeToString(arg.t, pos)).join("->") + "->" + typeToString(ret, pos);
+			case TLazy( f ): typeToString(f(), pos);
 			case TAnonymous( a ):
 				var sbuf = new StringBuf();
 				sbuf.add("{ ");
@@ -204,7 +206,7 @@ class Build
 		// Change all top-level var use to use the context's
 		// And change the parsed script to take off all no-ops and set the right position values
 		var contextVar = "__context__";
-		var defVars = new Hash();
+		var defVars = new StringMap();
 		//set our buffer and haxe keywords as a declared variable
 		defVars.set("__b__", true);
 		defVars.set("null", true);
@@ -257,7 +259,7 @@ class Build
 	//this internal function will traverse the AST and add a __context__ field access to any undeclared variable
 	//it will also correctly set the position information for all constant types. This could also be extended to set the correct
 	//position to any expression, but the most common error will most likely be in the constants part. (e.g. wrong variable name, etc)
-	static function changeExpr(e:Null<Expr>, contextExpr:Expr, declaredVars:Array<Hash<Bool>>, curPosInfo:{info:PosInfo, carry:Int, blockPos:Array<PosInfo>}, ?inCase = false, ?isType = false):Null<Expr>
+	static function changeExpr(e:Null<Expr>, contextExpr:Expr, declaredVars:Array<StringMap<Bool>>, curPosInfo:{info:PosInfo, carry:Int, blockPos:Array<PosInfo>}, ?inCase = false, ?isType = false):Null<Expr>
 	{
 		if (e == null)
 			return null;
@@ -308,7 +310,6 @@ class Build
 			case EArray( e1, e2 ): { expr:EArray(_recurse(e1), _recurse(e2)), pos:pos(e.pos) };
 			case EBinop( op, e1, e2): { expr:EBinop(op, _recurse(e1), _recurse(e2)), pos:pos(e.pos) };
 			case EField( e1, field ): { expr:EField(changeExpr(e1, contextExpr, declaredVars, curPosInfo, false, isType), field), pos:pos(e.pos) };
-			case EType( e1, field ): { expr:EType(changeExpr(e1, contextExpr, declaredVars, curPosInfo, false, true), field), pos:pos(e.pos) };
 			case EParenthesis( e1 ):  { expr:EParenthesis(changeExpr(e1, contextExpr, declaredVars, curPosInfo, inCase, isType)), pos:pos(e.pos) };
 			case EObjectDecl( fields ): { expr:EObjectDecl(fields.map(function(f) return { field:f.field, expr:_recurse(f.expr) } ).array()), pos:pos(e.pos) };
 			case EArrayDecl( values ): { expr:EArrayDecl(values.map(_recurse).array()), pos:pos(e.pos) };
@@ -342,7 +343,7 @@ class Build
 			}).array()), pos:pos(e.pos) };
 			case EFunction( name, f ):
 				addVar(name, declaredVars);
-				declaredVars.push(new Hash());
+				declaredVars.push(new StringMap());
 				for (arg in f.args)
 				{
 					addVar(arg.name, declaredVars);
@@ -352,7 +353,7 @@ class Build
 				declaredVars.pop();
 				ret;
 			case EBlock( exprs ):
-				declaredVars.push(new Hash());
+				declaredVars.push(new StringMap());
 				var ret = { expr:EBlock(exprs.map(_recurse).array()), pos:pos(e.pos) };
 				declaredVars.pop();
 				ret;
@@ -363,7 +364,7 @@ class Build
 					case EConst(c):
 						switch(c)
 						{
-							case CIdent(s), CType(s): addVar(s, declaredVars);
+							case CIdent(s): addVar(s, declaredVars);
 							default:
 						}
 					default:
@@ -376,7 +377,7 @@ class Build
 				{expr:ESwitch(_recurse(e),
 					cases.map(function(c)
 					{
-						declaredVars.push(new Hash());
+						declaredVars.push(new StringMap());
 						var ret = {
 							values:c.values.map(function(e) return changeExpr(e, contextExpr, declaredVars, curPosInfo, true)).array(),
 							expr:_recurse(c.expr)
@@ -400,12 +401,12 @@ class Build
 		}
 	}
 
-	static function addVar(name:String, declaredVars:Array<Hash<Bool>>):Void
+	static function addVar(name:String, declaredVars:Array<StringMap<Bool>>):Void
 	{
 		declaredVars[declaredVars.length - 1].set(name, true);
 	}
 
-	static function lookupVar(name:String, declaredVars:Array<Hash<Bool>>):Bool
+	static function lookupVar(name:String, declaredVars:Array<StringMap<Bool>>):Bool
 	{
 		for (v in declaredVars)
 		{
