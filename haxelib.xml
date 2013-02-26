@@ -2,7 +2,7 @@
     <user name="fponticelli"/>
 	<tag v="cross"/>
 	<tag v="template" />
-    <depends name="hscript" version="1.7"/>
+    <depends name="hscript" version="2.0"/>
     <description>A haXe implementation of the MVC 3 Razor template engine</description>
-    <version name="0.2.1">Support for getters by Clément (clemos)</version>
+    <version name="0.2.1">Support for getters by Clï¿½ment (clemos)</version>
 </project>
