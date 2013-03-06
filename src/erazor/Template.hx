@@ -2,6 +2,9 @@ package erazor;
 
 import hscript.Interp;
 import erazor.hscript.EnhancedInterp;
+#if haxe3
+import haxe.ds.StringMap in Hash;
+#end
 
 /**
  * Can be any object with properties or a Hash.

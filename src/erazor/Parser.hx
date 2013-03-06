@@ -51,24 +51,20 @@ class Parser
 			
 			if(!insideDoubleQuote && !insideSingleQuote)
 			{
-				switch(char)
+				if (char == startBrace)
 				{
-					case startBrace:
-						++stack;
-
-					case endBrace:
-						--stack;
-						
-						if(stack == 0)
-							return template.substr(0, i+1);
-						if (stack < 0)
-							throw new ParserError( 'Unbalanced braces for block: ', pos,  template.substr(0, 100) );
+					++stack;
+				} else if (char == endBrace) {
+					--stack;
 					
-					case '"':
-						insideDoubleQuote = true;
-						
-					case "'":
-						insideSingleQuote = true;
+					if(stack == 0)
+						return template.substr(0, i+1);
+					if (stack < 0)
+						throw new ParserError( 'Unbalanced braces for block: ', pos,  template.substr(0, 100) );
+				} else if (char == '"') {
+					insideDoubleQuote = true;
+				} else if (char == "'") {
+					insideSingleQuote = true;
 				}
 			}
 			else if(insideDoubleQuote && char == '"' && template.charAt(i-1) != '\\')

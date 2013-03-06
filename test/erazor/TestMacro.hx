@@ -1,7 +1,7 @@
 package erazor;
 import utest.Assert;
 using erazor.macro.Tools;
-
+import haxe.Int64;
 /**
  * ...
  * @author Waneck
@@ -79,7 +79,7 @@ class TestMacro
 	public function test_Source_level_explicit_import():Void
 	{
 		var template = new MacroTest10();
-		Assert.equals(Std.string(haxe.Int32.make(0x1234, 0x5678)), template.execute());
+		Assert.equals(Std.string(haxe.Int64.make(0x1234, 0x5678)), template.execute());
 	}
 }
 
@@ -152,8 +152,7 @@ class MacroTest9 extends erazor.macro.Template
 	public var str:String;
 }
 
-import haxe.Int32;
-@:template("@Int32.make(0x1234,0x5678)")
+@:template("@Int64.make(0x1234,0x5678)")
 class MacroTest10 extends erazor.macro.Template
 {
 	

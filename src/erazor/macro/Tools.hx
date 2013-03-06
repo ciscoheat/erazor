@@ -22,9 +22,9 @@ class Tools
 	 * @return	An expression block that sets all the values and has the template var as the last expression.
 	 */
 #if haxe_210
-	@:macro public static function setData(template:ExprOf<Template>, fields:Array<Expr>):Expr
+	macro public static function setData(template:ExprOf<Template>, fields:Array<Expr>):Expr
 #else
-	@:macro public static function setData(fields:Array<Expr>):Expr
+	macro public static function setData(fields:Array<Expr>):Expr
 #end
 	{
 		var bl = [];
@@ -37,7 +37,7 @@ class Tools
 		
 		switch(template.expr)
 		{
-			case EConst(c): //CIdent
+			case EConst(_): //CIdent
 				templateVar = template;
 			default:
 				bl.push( { expr : EVars([ { type: null, name : "__tmpl__", expr : template } ]), pos : template.pos } );

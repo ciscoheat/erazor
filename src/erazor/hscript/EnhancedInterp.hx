@@ -11,18 +11,16 @@ class EnhancedInterp extends Interp
 	static var re = ~/^[^0-9]+(\d+)/;
 #end
 	override public function new(){
-		#if getter_support
-		ReflectMacro.addMeta();
-		#end
 		super();
-
+		//require StringBuf's add field
+		var add = new StringBuf().add;
 	}
 	override function get( o : Dynamic, f : String ) : Dynamic {
 		if( o == null ) throw Error.EInvalidAccess(f);
 		
 		return 
 		#if getter_support
-		 EnhancedReflect.getProperty(o,f);
+		 Reflect.getProperty(o,f);
 		#else
 		 Reflect.field( o , f );
 		#end

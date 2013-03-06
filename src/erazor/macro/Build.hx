@@ -5,8 +5,8 @@ import erazor.ScriptBuilder;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
-import neko.FileSystem;
-import neko.io.File;
+import sys.FileSystem;
+import sys.io.File;
 
 using Lambda;
 
@@ -81,7 +81,7 @@ class Build
 				switch(c)
 				{
 					case CString(s): s;
-					case CIdent(s), CType(s): if (acceptIdent) s; else null;
+					case CIdent(s): if (acceptIdent) s; else null;
 					default: null;
 				}
 			default: null;
@@ -229,7 +229,6 @@ class Build
 			case EArray( e1, e2 ): { expr:EArray(_recurse(e1), _recurse(e2)), pos:pos(e.pos) };
 			case EBinop( op, e1, e2): { expr:EBinop(op, _recurse(e1), _recurse(e2)), pos:pos(e.pos) };
 			case EField( e1, field ): { expr:EField(changeExpr(e1, curPosInfo), field), pos:pos(e.pos) };
-			case EType( e1, field ): { expr:EType(changeExpr(e1, curPosInfo), field), pos:pos(e.pos) };
 			case EParenthesis( e1 ):  { expr:EParenthesis(changeExpr(e1, curPosInfo)), pos:pos(e.pos) };
 			case EObjectDecl( fields ): { expr:EObjectDecl(fields.map(function(f) return { field:f.field, expr:_recurse(f.expr) } ).array()), pos:pos(e.pos) };
 			case EArrayDecl( values ): { expr:EArrayDecl(values.map(_recurse).array()), pos:pos(e.pos) };
@@ -274,6 +273,7 @@ class Build
 					cases.map(function(c)
 					{
 						return {
+							guard: _recurse(c.guard),
 							values:c.values.map(function(e) return changeExpr(e, curPosInfo)).array(),
 							expr:_recurse(c.expr)
 						};
@@ -286,7 +286,7 @@ class Build
 			case EThrow( e ): { expr:EThrow(_recurse(e)), pos:pos(e.pos) };
 			case ECast( e, t ): { expr:ECast(_recurse(e), t), pos:pos(e.pos) };
 			case EDisplay( e, isCall ): { expr:EDisplay(_recurse(e), isCall), pos:pos(e.pos) };
-			case EDisplayNew( t ): e;
+			case EDisplayNew( _ ): e;
 			case ETernary( econd, eif, eelse ): { expr:ETernary(_recurse(econd), _recurse(eif), _recurse(eelse)), pos:pos(e.pos) };
 			default: throw "Not implemented";
 		}
