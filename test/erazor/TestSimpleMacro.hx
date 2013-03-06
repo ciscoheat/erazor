@@ -131,7 +131,6 @@ class SimpleMacroTest6 extends erazor.macro.SimpleTemplate<{ x:Float }>
 		}@x}")
 class SimpleMacroTest7 extends erazor.macro.SimpleTemplate<{ vars:Array<Dynamic> }>
 {
-	public var vars:Array<Dynamic>;
 }
 
 @:template("@haxe.io.Bytes.ofString(str).toHex()")
