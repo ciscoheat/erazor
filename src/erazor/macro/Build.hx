@@ -2,8 +2,11 @@ package erazor.macro;
 import erazor.error.ParserError;
 import erazor.Parser;
 import erazor.ScriptBuilder;
+import haxe.ds.StringMap;
+import haxe.ds.StringMap;
 import haxe.macro.Context;
 import haxe.macro.Expr;
+import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import sys.FileSystem;
 import sys.io.File;
@@ -72,7 +75,7 @@ class Build
 #end
 	}
 
-#if !display
+#if !das
 	public static function getString(e:Expr, ?acceptIdent = false, ?throwExceptions = true):Null<String>
 	{
 		var ret = switch(e.expr)
@@ -118,10 +121,8 @@ class Build
 		var builder = new ScriptBuilder('__b__');
 		for (block in parsedBlocks)
 		{
-			#if !erazor_macro_debug
 			//we'll include a no-op so we can distinguish the blocks.
 			buildedBlocks.add("__blockbegin__;\n");
-			#end
 			buildedBlocks.add(builder.blockToString(block.block));
 		}
 		buildedBlocks.add("}");
@@ -144,25 +145,43 @@ class Build
 		w.close();
 		#end
 		
+		var declaredVars = ["this" => true], promotedField = null;
+		for (f in fields)
+		{
+			declaredVars.set(f.name, true);
+			if (f.meta.exists(function(m) return m.name == "promote" || m.name == ":promote"))
+			{
+				if (promotedField == null)
+					promotedField = f.name;
+				else
+					Context.error("Only one promoted field is allowed, but '" + promotedField +"' and '" + f.name + "' were declared", f.pos);
+			}
+		}
+		
+		//now add all declaredVars from superclasses
+		function loop(c:Ref<ClassType>)
+		{
+			var c = c.get();
+			for (f in c.fields.get())
+				declaredVars.set(f.name, true);
+			
+			var sc = c.superClass;
+			if (sc != null)
+			{
+				loop(sc.t);
+			}
+		}
+		loop(Context.getLocalClass());
+		
 		// Call macro string -> macro parser
 		var expr = Context.parse(script, Context.makePosition( { min:0, max:script.length, file:file } ));
-		#if !erazor_macro_debug
-		expr = changeExpr(expr, { info:null, carry:0, blockPos:blockPos } );
-		#end
+		expr = new MacroBuildMap(blockPos, promotedField, declaredVars).map(expr);
 		
 		var executeBlock = [];
 		
-		var bvar = switch(Context.parse("{var __b__ = new StringBuf();}", pos).expr) 
-		{
-			case EBlock(b): b[0];
-			default:throw "assert";
-		};
-		
-		//var __b__ = new StringBuf();
-		executeBlock.push(bvar);
-		//the executed script
+		executeBlock.push(macro var __b__ = new StringBuf());
 		executeBlock.push(expr);
-		executeBlock.push(Context.parse("return __b__.toString()", pos));
+		executeBlock.push(macro return __b__.toString());
 		
 		//return new execute() field
 		fields.push({
@@ -181,115 +200,172 @@ class Build
 		
 		return fields;
 	}
+}
+
+class MacroBuildMap
+{
+	var info:PosInfo;
+	var carry:Int;
+	var blockPos:Array<PosInfo>;
+	var promotedField:Null<Expr>;
 	
-	//this internal function will traverse the AST and add a __context__ field access to any undeclared variable
-	//it will also correctly set the position information for all constant types. This could also be extended to set the correct
-	//position to any expression, but the most common error will most likely be in the constants part. (e.g. wrong variable name, etc)
-	static function changeExpr(e:Null<Expr>, curPosInfo:{info:PosInfo, carry:Int, blockPos:Array<PosInfo>}):Null<Expr>
+	var declaredVars:Array<StringMap<Bool>>;
+	
+	public function new(blockPos, promotedField:String, declaredVars)
 	{
-		if (e == null)
-			return null;
-			
-		function _recurse(e:Expr)
-		{
-			return changeExpr(e, curPosInfo);
-		}
+		this.carry = 0;
+		this.blockPos = blockPos;
+		this.declaredVars = [ declaredVars ];
+		if (promotedField != null)
+			this.promotedField = macro $(promotedField);
+	}
+	
+	function lookupVar(name:String)
+	{
+		for (v in declaredVars)
+			if (v.exists(name))
+				return true;
+		return false;
+	}
+	
+	function pos(lastPos:Position)
+	{
+		var info = info;
+		var pos = Context.getPosInfos(lastPos);
+		var len = pos.max - pos.min;
 		
-		function pos(lastPos:Position)
-		{
-			var info = curPosInfo.info;
-			var pos = Context.getPosInfos(lastPos);
-			var len = pos.max - pos.min;
-			
-			var min = pos.min - curPosInfo.carry;
-			var ret = Context.makePosition( { file: info.file, min:min, max:min + len } );
-			
-			return ret;
-		}
+		var min = pos.min - carry;
+		var ret = Context.makePosition( { file: info.file, min:min, max:min + len } );
 		
+		return ret;
+	}
+	
+	public function map(e:Expr):Expr
+	{
+		if (e == null) return null;
 		return switch(e.expr)
 		{
-			case EConst( c ):
-				switch (c)
+		case EConst(CIdent("__blockbegin__")):
+			var info = blockPos.pop();
+			var pos = Context.getPosInfos(e.pos);
+			this.info = info;
+			
+			carry = pos.max - info.min - 3;
+			{expr:EConst(CIdent("null")), pos:e.pos };
+		case EConst(CIdent(s)) if (promotedField == null || (s.charCodeAt(0) >= 'A'.code && s.charCodeAt(0) <= 'Z'.code) || lookupVar(s)):
+			{expr:EConst(CIdent(s)), pos:pos(e.pos) };
+		case EConst(CIdent(s)):
+			{expr:EField(promotedField, s), pos:pos(e.pos) }
+		//we need to check if we find the expression __b__.add()
+		//in order to not mess with the positions
+		case ECall(e1 = macro __b__.add, params): //behold the beauty of pattern matching!
+			var p = Context.getPosInfos(e1.pos);
+			carry += (p.max - p.min) + 2;
+
+			var ret = { expr:ECall(macro __b__.add, params.map(map)), pos:e.pos };
+			carry += 3;
+			ret;
+		case EVars(vars):
+			for (v in vars)
+				addVar(v.name);
+			var ret = ExprTools.map(e, map);
+			ret.pos = pos(ret.pos);
+			ret;
+		case EFunction(name, f):
+			if (name != null)
+				addVar(name);
+			pushStack([ for (arg in f.args) arg.name => true ]);
+			var ret = ExprTools.map(e, map);
+			ret.pos = pos(ret.pos);
+			popStack();
+			ret;
+		case EBlock(_):
+			pushStack();
+			var ret = ExprTools.map(e, map);
+			ret.pos = pos(ret.pos);
+			popStack();
+			ret;
+		case EField(e1, f) if (promotedField != null):
+			//check all fields first
+			var hasTypeFields = f.charCodeAt(0) >= 'A'.code && f.charCodeAt(0) <= 'Z'.code;
+			function checkField(e:Expr)
+			{
+				switch(e.expr)
 				{
-					case CIdent(s):
-						if (s == "__blockbegin__") 
-						{
-							var info = curPosInfo.blockPos.pop();
-							var pos = Context.getPosInfos(e.pos);
-							curPosInfo.info = info;
-							
-							curPosInfo.carry = pos.max - info.min - 3;
-							{expr:EConst(CIdent("null")), pos:e.pos };
-						} else {
-							{expr:EConst(c), pos:pos(e.pos) };
-						}
-					default: {expr:EConst(c), pos:pos(e.pos) };
+				case EField(_, f) | EConst(CIdent(f)) if (f.charCodeAt(0) >= 'A'.code && f.charCodeAt(0) <= 'Z'.code):
+					hasTypeFields = true;
+					ExprTools.iter(e, checkField);
+				case EParenthesis(_), EField(_, _): //continue looking
+					ExprTools.iter(e, checkField);
+				case EConst(CIdent(_)):
+				default: //stop looking; isn't a type field
+					hasTypeFields = false;
 				}
-			case EArray( e1, e2 ): { expr:EArray(_recurse(e1), _recurse(e2)), pos:pos(e.pos) };
-			case EBinop( op, e1, e2): { expr:EBinop(op, _recurse(e1), _recurse(e2)), pos:pos(e.pos) };
-			case EField( e1, field ): { expr:EField(changeExpr(e1, curPosInfo), field), pos:pos(e.pos) };
-			case EParenthesis( e1 ):  { expr:EParenthesis(changeExpr(e1, curPosInfo)), pos:pos(e.pos) };
-			case EObjectDecl( fields ): { expr:EObjectDecl(fields.map(function(f) return { field:f.field, expr:_recurse(f.expr) } ).array()), pos:pos(e.pos) };
-			case EArrayDecl( values ): { expr:EArrayDecl(values.map(_recurse).array()), pos:pos(e.pos) };
-			case ECall( e1, params): 
-				//we need to check if we find the expression __b__.add()
-				//in order to not mess with the positions
-				switch(e1.expr)
-				{
-					case EField(e, f):
-						if (f == "add")
-						{
-							if (Std.string(e.expr) == "EConst(CIdent(__b__))")
-							{
-								var p = Context.getPosInfos(e1.pos);
-								curPosInfo.carry += (p.max - p.min) + 2;
-								
-								var ret = { expr:ECall(e1, params.map(function(e) return changeExpr(e,curPosInfo)).array()), pos:e.pos };
-								curPosInfo.carry += 3;
-								ret;
-							}
-						}
-					default:
-				}
-				
-				{ expr:ECall(_recurse(e1), params.map(function(e) return changeExpr(e, curPosInfo)).array()), pos:pos(e.pos) };
-			case ENew( t, params ): { expr:ENew(t, params.map(_recurse).array()), pos:pos(e.pos)};
-			case EUnop( op, postFix, e1 ): { expr:EUnop(op, postFix, _recurse(e1)), pos:pos(e.pos) };
-			case EVars( vars): { expr:EVars(vars.map(function(v) {
-				return { name:v.name, type:v.type, expr:_recurse(v.expr) };
-			}).array()), pos:pos(e.pos) };
-			case EFunction( name, f ): 
-				{ expr:EFunction(name, { args:f.args, ret:f.ret, expr:_recurse(f.expr), params:f.params } ), pos:pos(e.pos) };
-			case EBlock( exprs ):
-				{ expr:EBlock(exprs.map(_recurse).array()), pos:pos(e.pos) };
-			case EFor( it, expr ): { expr:EFor(_recurse(it), _recurse(expr)), pos:pos(e.pos) };
-			case EIn( e1, e2 ): 
-				{ expr:EIn(_recurse(e1), _recurse(e2)), pos:pos(e.pos) };
-			case EIf( econd, eif, eelse): { expr:EIf(_recurse(econd), _recurse(eif), _recurse(eelse)), pos:pos(e.pos) };
-			case EWhile( econd, e1, normalWhile ): { expr:EWhile(_recurse(econd), _recurse(e1), normalWhile), pos:pos(e.pos) };
-			case ESwitch( e, cases, edef ):
-				{expr:ESwitch(_recurse(e),
-					cases.map(function(c)
-					{
-						return {
-							guard: _recurse(c.guard),
-							values:c.values.map(function(e) return changeExpr(e, curPosInfo)).array(),
-							expr:_recurse(c.expr)
-						};
-					}).array(), _recurse(edef)),
-				pos:pos(e.pos)}
-			case ETry( e , catches ): {expr:ETry(_recurse(e), catches.map(function(c) return { name:c.name, type:c.type, expr:_recurse(c.expr) } ).array()), pos:pos(e.pos) };
-			case EReturn( e ): { expr:EReturn(_recurse(e)), pos:pos(e.pos) };
-			case EBreak, EContinue: e;
-			case EUntyped( e ): { expr:EUntyped(_recurse(e)), pos:pos(e.pos) };
-			case EThrow( e ): { expr:EThrow(_recurse(e)), pos:pos(e.pos) };
-			case ECast( e, t ): { expr:ECast(_recurse(e), t), pos:pos(e.pos) };
-			case EDisplay( e, isCall ): { expr:EDisplay(_recurse(e), isCall), pos:pos(e.pos) };
-			case EDisplayNew( _ ): e;
-			case ETernary( econd, eif, eelse ): { expr:ETernary(_recurse(econd), _recurse(eif), _recurse(eelse)), pos:pos(e.pos) };
-			default: throw "Not implemented";
+			}
+			checkField(e1);
+			if (hasTypeFields)
+			{
+				var old = this.promotedField;
+				var ret = ExprTools.map(e, map);
+				ret.pos = pos(ret.pos);
+				this.promotedField = old;
+				ret;
+			} else {
+				var ret = ExprTools.map(e, map);
+				ret.pos = pos(ret.pos);
+				ret;
+			}
+		case ESwitch(e1, cases, edef):
+			cases = cases.map(function(c) {
+				pushStack();
+				for (v in c.values) addIdents(v);
+				var ret = {
+					values: c.values,
+					guard: map(c.guard),
+					expr: map(c.expr)
+				};
+				popStack();
+				return ret;
+			});
+			{ expr: ESwitch(map(e1), cases, map(edef)), pos: pos(e.pos) };
+		case ETry(e1, catches):
+			catches = catches.map(function(c) {
+				pushStack([c.name => true]);
+				var ret = { type: c.type, name:c.name, expr: map(c.expr) };
+				popStack();
+				return ret;
+			});
+			{ expr: ETry(map(e1), catches), pos: pos(e.pos) };	
+		default:
+			var ret = ExprTools.map(e, map);
+			ret.pos = pos(ret.pos);
+			return ret;
 		}
+	}
+	
+	function addIdents(e:Expr)
+	{
+		switch(e.expr)
+		{
+		case EConst(CIdent(s)) if (s.charCodeAt(0) < 'A'.code || s.charCodeAt(0) > 'Z'.code): addVar(s);
+		default: ExprTools.iter(e, addIdents);
+		}
+	}
+	
+	function addVar(v:String)
+	{
+		declaredVars[declaredVars.length - 1].set(v, true);
+	}
+	
+	function pushStack(?map)
+	{
+		if (map == null) map = new StringMap();
+		declaredVars.push(map);
+	}
+	
+	function popStack()
+	{
+		declaredVars.pop();
 	}
 }
 #end
