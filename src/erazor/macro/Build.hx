@@ -40,6 +40,7 @@ class Build
 		
 		var fields = Context.getBuildFields();
 		
+		var isAbstract = false;
 		for (meta in cls.meta.get())
 		{
 			switch(meta.name)
@@ -65,10 +66,11 @@ class Build
 					var pos = Context.makePosition( { min:0, max:contents.length, file:templatePath } );
 					
 					return build(contents, pos, fields);
+				case 'abstractTemplate', ':abstractTemplate': isAbstract = true;
 			}
 		}
 		
-		if (isFirst)
+		if (isFirst && !isAbstract)
 			throw new Error("No :template meta or :includeTemplate meta were found", cls.pos);
 		
 		return fields;
@@ -137,14 +139,6 @@ class Build
 		
 		var file = "_internal_";
 		
-		#if erazor_macro_debug
-		file = haxe.io.Path.withoutExtension(posInfo.file) + "_" + Context.getLocalClass().toString().split(".").pop() + "_debug.erazor";
-		
-		var w = File.write(file, false);
-		w.writeString(script);
-		w.close();
-		#end
-		
 		var declaredVars = ["this" => true], promotedField = null;
 		for (f in fields)
 		{
@@ -159,23 +153,48 @@ class Build
 		}
 		
 		//now add all declaredVars from superclasses
-		function loop(c:Ref<ClassType>)
+		var shouldLookSuper = promotedField == null;
+		function loop(c:Ref<ClassType>, isFirst:Bool)
 		{
 			var c = c.get();
+			if (!isFirst && shouldLookSuper)
+			{
+				shouldLookSuper = c.meta.has("abstractTemplate") || c.meta.has(":abstractTemplate");
+			}
+			
 			for (f in c.fields.get())
-				declaredVars.set(f.name, true);
+			{
+				if (shouldLookSuper && (f.meta.has(':promote') || f.meta.has('promote')))
+				{
+					promotedField = f.name;
+					shouldLookSuper = false;
+				} else {
+					declaredVars.set(f.name, true);
+				}
+			}
 			
 			var sc = c.superClass;
 			if (sc != null)
 			{
-				loop(sc.t);
+				loop(sc.t, false);
 			}
 		}
-		loop(Context.getLocalClass());
+		loop(Context.getLocalClass(), true);
 		
 		// Call macro string -> macro parser
 		var expr = Context.parse(script, Context.makePosition( { min:0, max:script.length, file:file } ));
 		expr = new MacroBuildMap(blockPos, promotedField, declaredVars).map(expr);
+		
+		#if erazor_macro_debug
+		file = haxe.io.Path.withoutExtension(posInfo.file) + "_" + Context.getLocalClass().toString().split(".").pop() + "_debug.erazor";
+		
+		var w = File.write(file, false);
+		var str = ExprTools.toString(expr);
+		w.writeString(str);
+		w.close();
+		
+		expr = Context.parse(str, Context.makePosition( { min:0, max:str.length, file: file } ));
+		#end
 		
 		var executeBlock = [];
 		
@@ -217,7 +236,7 @@ class MacroBuildMap
 		this.blockPos = blockPos;
 		this.declaredVars = [ declaredVars ];
 		if (promotedField != null)
-			this.promotedField = macro $(promotedField);
+			this.promotedField = { expr: EConst(CIdent(promotedField)), pos: Context.currentPos() };
 	}
 	
 	function lookupVar(name:String)
@@ -306,6 +325,7 @@ class MacroBuildMap
 			if (hasTypeFields)
 			{
 				var old = this.promotedField;
+				this.promotedField = null;
 				var ret = ExprTools.map(e, map);
 				ret.pos = pos(ret.pos);
 				this.promotedField = old;
@@ -336,6 +356,13 @@ class MacroBuildMap
 				return ret;
 			});
 			{ expr: ETry(map(e1), catches), pos: pos(e.pos) };	
+		case EFor( { expr: EIn(e1, _) }, _):
+			pushStack();
+			addIdents(e1);
+			var ret = ExprTools.map(e, map);
+			popStack();
+			ret.pos = pos(ret.pos);
+			return ret;
 		default:
 			var ret = ExprTools.map(e, map);
 			ret.pos = pos(ret.pos);
