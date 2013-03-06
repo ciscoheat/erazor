@@ -77,7 +77,7 @@ class Build
 #end
 	}
 
-#if !das
+#if !display
 	public static function getString(e:Expr, ?acceptIdent = false, ?throwExceptions = true):Null<String>
 	{
 		var ret = switch(e.expr)
