@@ -88,6 +88,14 @@ class TestMacro
 		var template = new MacroTest10();
 		Assert.equals(Std.string(haxe.Int64.make(0x1234, 0x5678)), template.execute());
 	}
+
+	public function test_Identifiers()
+	{
+		var template = new MacroTest11();
+		Assert.equals("Null Instance", template.execute());
+		template.x = "Test";
+		Assert.equals("Test", template.execute());
+	}
 }
 
 @:template("Hello @name")
@@ -163,6 +171,12 @@ class MacroTest9 extends erazor.macro.Template
 class MacroTest10 extends erazor.macro.Template
 {
 
+}
+
+@:template("@if(x == null || false || !true){Null Instance} else {@x}")
+class MacroTest11 extends erazor.macro.Template
+{
+	public var x:String;
 }
 
 /*
