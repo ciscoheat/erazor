@@ -1,6 +1,9 @@
 ﻿package erazor;
 
 import utest.Assert;
+#if haxe3
+import haxe.ds.StringMap in Hash;
+#end
 
 class TestTemplate
 {
