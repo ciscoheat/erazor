@@ -6,6 +6,7 @@
 -lib utest
 -lib hscript
 -swf bin/TestAll.8.swf
+-swf-version 8
 # @tm-preview
 
 --next
@@ -16,7 +17,7 @@
 -cp src
 -lib utest
 -lib hscript
--swf9 bin/TestAll.9.swf
+-swf bin/TestAll.9.swf
 # @tm-preview
 
 --next
@@ -69,5 +70,28 @@
 -cmd bin/TestAll/TestAll
 -cmd echo "==========</CPP>=========="
 
+--next
+# java
+-main TestAll
+-cp test
+-cp src
+-lib utest
+-lib hscript
+-java bin/TestAll
+-cmd echo "==========<JAVA>=========="
+-cmd java -jar bin/TestAll/TestAll.jar
+-cmd echo "==========</JAVA>=========="
+
+--next
+# cs
+-main TestAll
+-cp test
+-cp src
+-lib utest
+-lib hscript
+-cs bin/TestAll
+-cmd echo "==========<CS>=========="
+-cmd mono --debug bin/TestAll/bin/TestAll.exe
+-cmd echo "==========</CS>=========="
 
 # @tm-preview
