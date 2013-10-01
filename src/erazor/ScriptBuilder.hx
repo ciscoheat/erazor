@@ -31,7 +31,7 @@ class ScriptBuilder
 				return s + "\n";
 			
 			case printBlock(s):
-				return context + ".add(" + s + ");\n";
+				return context + ".unsafeAdd(" + s + ");\n";
 		}
 	}
 }

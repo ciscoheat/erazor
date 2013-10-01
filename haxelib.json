@@ -1,0 +1,14 @@
+{
+  "name": "erazor",
+  "license": "BSD",
+  "classPath": "src",
+  "tags": ["cross","template"],
+  "description": "A haXe implementation of the MVC 3 Razor template engine",
+  "contributors": ["fponticelli"],
+  "releasenote": "Haxe 3.0",
+  "version": "0.2.0",
+  "url": "http://github.com/ciscoheat/erazor",
+  "dependencies": {
+    "hscript": ""
+  }
+}
