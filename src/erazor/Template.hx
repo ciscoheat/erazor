@@ -17,14 +17,27 @@ class Template
 	
 	public var variables(default, null) : Hash<Dynamic>;
 	
+	public var helpers : Hash<Dynamic>;
+	
 	public function new(template : String)
 	{
 		this.template = template;
+		this.helpers = new Hash<Dynamic>();
+	}
+	
+	public dynamic function escape(str : String) : String
+	{
+		return str;
+	}
+	
+	public function addHelper(name : String, helper : Dynamic) : Void
+	{
+		helpers.set(name, helper);
 	}
 	
 	public function execute(?content : PropertyObject) : String
 	{
-		var buffer = new StringBuf();
+		var buffer = new Output(escape);
 		
 		// Parse the template into TBlocks for the HTemplateParser
 		var parsedBlocks = new Parser().parse(template);
@@ -42,6 +55,7 @@ class Template
 		
 		var bufferStack = [];
 		
+		setInterpreterVars(interp, helpers);
 		setInterpreterVars(interp, content);
 		
 		interp.variables.set('__b__', buffer); // Connect the buffer to the script
