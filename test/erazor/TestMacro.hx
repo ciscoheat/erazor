@@ -1,6 +1,8 @@
 package erazor;
 import utest.Assert;
 import haxe.Int64;
+import erazor.Output;
+using erazor.Output;
 /**
  * ...
  * @author Waneck
@@ -96,6 +98,40 @@ class TestMacro
 		template.x = "Test";
 		Assert.equals("Test", template.execute());
 	}
+	
+	public function test_If_HtmlTemplate_strings_are_escaped()
+	{
+		var template = new MacroTest12();
+		template.text = "< > & \" '";
+		Assert.equals("&lt; &gt; &amp; &quot; &#039;", template.execute());
+		
+		var template2 = new MacroTest13();
+		template2.users = ["admin", "<script>"];
+		Assert.equals("<div>admin</div><div>&lt;script&gt;</div>", template2.execute());
+	}
+	
+	public function test_If_HtmlTemplate_raw_works()
+	{
+		var template = new MacroTest14();
+		template.text = "< > & \" '";
+		Assert.equals("< > & \" '", template.execute());
+		
+		var template2 = new MacroTest15();
+		template2.users = ["admin", "<script>"];
+		Assert.equals("<div>admin</div><div><script></div>", template2.execute());
+	}
+	
+	public function test_If_HtmlTemplate_SafeString_works()
+	{
+		var template = new MacroTest16();
+		template.text = new SafeString("< > & \" '");
+		Assert.equals("< > & \" '", template.execute());
+		
+		var template2 = new MacroTest17();
+		template2.users = ["admin".safe(), "<script>".safe()];
+		Assert.equals("<div>admin</div><div><script></div>", template2.execute());
+	}	
+	
 }
 
 @:template("Hello @name")
@@ -177,6 +213,43 @@ class MacroTest10 extends erazor.macro.Template
 class MacroTest11 extends erazor.macro.Template
 {
 	public var x:String;
+}
+
+
+@:template("@text")
+class MacroTest12 extends erazor.macro.HtmlTemplate
+{
+	public var text:String;
+}
+
+@:template("@for(u in users){<div>@u</div>}")
+class MacroTest13 extends erazor.macro.HtmlTemplate
+{
+	public var users:Array<String>;
+}
+
+@:template("@raw(text)")
+class MacroTest14 extends erazor.macro.HtmlTemplate
+{
+	public var text:String;
+}
+
+@:template("@for(u in users){<div>@raw(u)</div>}")
+class MacroTest15 extends erazor.macro.HtmlTemplate
+{
+	public var users:Array<String>;
+}
+
+@:template("@text")
+class MacroTest16 extends erazor.macro.HtmlTemplate
+{
+	public var text:TString;
+}
+
+@:template("@for(u in users){<div>@u</div>}")
+class MacroTest17 extends erazor.macro.HtmlTemplate
+{
+	public var users:Array<TString>;
 }
 
 /*

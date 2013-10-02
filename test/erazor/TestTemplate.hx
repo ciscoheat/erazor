@@ -1,9 +1,12 @@
 ﻿package erazor;
 
 import utest.Assert;
+import erazor.Output;
 #if haxe3
 import haxe.ds.StringMap in Hash;
 #end
+
+using erazor.Output;
 
 class TestTemplate
 {
@@ -47,6 +50,36 @@ class TestTemplate
 		
 		template = new Template("@{var a = 9; var b = '9'; while(--a > 0){b += a;} }@b");
 		Assert.equals("987654321", template.execute());
+	}
+	
+	public function test_If_HtmlTemplate_strings_are_escaped()
+	{
+		template = new HtmlTemplate("@text");
+		Assert.equals("&lt; &gt; &amp; &quot; &#039;", template.execute( { text: "< > & \" '" } ));
+		
+		template = new HtmlTemplate("@for(u in users){<div>@u</div>}");
+		Assert.equals("<div>admin</div><div>&lt;script&gt;</div>", template.execute( { users: ["admin","<script>",] } ));
+	}
+	
+	public function test_If_HtmlTemplate_raw_works()
+	{
+		template = new HtmlTemplate("@raw(text)");
+		Assert.equals("< > & \" '", template.execute( { text: "< > & \" '" } ));
+		
+		template = new HtmlTemplate("@for(u in users){<div>@raw(u)</div>}");
+		Assert.equals("<div>admin</div><div><script></div>", template.execute( { users: ["admin", "<script>", ] } ));
+		
+		template = new HtmlTemplate("@raw(text)");
+		Assert.equals("&lt; &gt; &amp; &quot; &#039;", template.execute( { text: new UnsafeString("< > & \" '") } ));
+	}
+	
+	public function test_If_HtmlTemplate_SafeString_works()
+	{
+		template = new HtmlTemplate("@text");
+		Assert.equals("< > & \" '", template.execute( { text: new SafeString("< > & \" '") } ));
+		
+		template = new HtmlTemplate("@for(u in users){<div>@u</div>}");
+		Assert.equals("<div>admin</div><div><script></div>", template.execute( { users: ["admin".safe(), "<script>".safe()] } ));
 	}
 
 	/*

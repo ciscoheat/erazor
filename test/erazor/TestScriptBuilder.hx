@@ -30,7 +30,7 @@ class TestScriptBuilder
 		
 		assertScript([
 			"__b__.add('Hello ');",
-			"__b__.add(name);"
+			"__b__.unsafeAdd(name);"
 		], builder.build(input));
 	}
 	
@@ -68,7 +68,7 @@ class TestScriptBuilder
 		
 		assertScript([
 			"for(u in users) {",
-			"__b__.add(u.name);",
+			"__b__.unsafeAdd(u.name);",
 			"__b__.add('<br>');",
 			"}"
 		], builder.build(input));

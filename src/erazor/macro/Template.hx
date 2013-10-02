@@ -18,6 +18,11 @@ class Template
 		
 	}
 	
+	public dynamic function escape(str : String) : String
+	{
+		return str;
+	}
+	
 	public function execute():String
 	{
 		return null;
