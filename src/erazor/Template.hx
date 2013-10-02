@@ -17,17 +17,22 @@ class Template
 	
 	public var variables(default, null) : Hash<Dynamic>;
 	
-	public function new(template : String, htmlEscape = false)
+	public var helpers : Hash<Dynamic>;
+	
+	public function new(template : String)
 	{
 		this.template = template;
-		if (htmlEscape) {
-			escape = StringTools.htmlEscape.bind(_, true);
-		}
+		this.helpers = new Hash<Dynamic>();
 	}
 	
 	public dynamic function escape(str : String) : String
 	{
 		return str;
+	}
+	
+	public function addHelper(name : String, helper : Dynamic) : Void
+	{
+		helpers.set(name, helper);
 	}
 	
 	public function execute(?content : PropertyObject) : String
@@ -50,6 +55,7 @@ class Template
 		
 		var bufferStack = [];
 		
+		setInterpreterVars(interp, helpers);
 		setInterpreterVars(interp, content);
 		
 		interp.variables.set('__b__', buffer); // Connect the buffer to the script

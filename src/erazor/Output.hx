@@ -35,6 +35,8 @@ class UnsafeString extends TString {
 	}
 }
 
+
+
 class Output extends StringBuf {
 
 	public function new( escapeMethod = null ){
@@ -54,6 +56,14 @@ class Output extends StringBuf {
 		}
 
 		add(val);
+	}
+	
+	public static function safe( str : String ) {
+		return new SafeString( str );
+	}
+	
+	public static function unsafe( str : String ) {
+		return new UnsafeString( str );
 	}
 
 }
